@@ -1,5 +1,7 @@
-import SectionHeading from "@/app/components/ui/section-heading";
-import SeasonalPairingCard from "@/app/components/cards/seasonal-pairing-card";
+import {
+  SeasonalPairingCardMobile,
+  SeasonalPairingCardDesktop,
+} from "@/app/components/cards/seasonal-pairing-card";
 
 const pairings = [
   {
@@ -41,10 +43,17 @@ export default function SeasonalPairingsSection() {
           </span>
         </div>
 
-        {/* Mobile: horizontal scroll / Desktop: 3-column grid */}
-        <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4 md:gap-10 md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
+        {/* Mobile: horizontal scroll */}
+        <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4 md:hidden">
           {pairings.map((pairing) => (
-            <SeasonalPairingCard key={pairing.food} {...pairing} />
+            <SeasonalPairingCardMobile key={pairing.food} {...pairing} />
+          ))}
+        </div>
+
+        {/* Desktop: 3-column grid */}
+        <div className="hidden md:grid md:grid-cols-3 md:gap-10">
+          {pairings.map((pairing) => (
+            <SeasonalPairingCardDesktop key={pairing.food} {...pairing} />
           ))}
         </div>
       </div>

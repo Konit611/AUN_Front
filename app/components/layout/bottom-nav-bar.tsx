@@ -1,3 +1,8 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 const navItems = [
   {
     label: "ホーム",
@@ -13,7 +18,6 @@ const navItems = [
         />
       </svg>
     ),
-    active: true,
   },
   {
     label: "日本酒図鑑",
@@ -60,24 +64,31 @@ const navItems = [
 ];
 
 export default function BottomNavBar() {
+  const pathname = usePathname();
+
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface border-t border-border">
       <ul className="flex items-center justify-around h-20 px-4">
-        {navItems.map((item) => (
-          <li key={item.href}>
-            <a
-              href={item.href}
-              className={`flex flex-col items-center gap-1.5 text-[11px] ${
-                item.active
-                  ? "text-accent font-medium"
-                  : "text-text-muted hover:text-text-secondary"
-              } transition-colors`}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </a>
-          </li>
-        ))}
+        {navItems.map((item) => {
+          const isActive =
+            item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+
+          return (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                className={`flex flex-col items-center gap-1.5 text-[11px] ${
+                  isActive
+                    ? "text-accent font-medium"
+                    : "text-text-muted hover:text-text-secondary"
+                } transition-colors`}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );

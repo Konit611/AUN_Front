@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const footerLinks = [
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms of Service", href: "/terms" },
@@ -19,12 +21,12 @@ export default function Footer() {
         <ul className="flex items-center gap-8">
           {footerLinks.map((link) => (
             <li key={link.href}>
-              <a
+              <Link
                 href={link.href}
                 className="text-sm text-text-muted hover:text-text-primary transition-colors"
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface SectionHeadingProps {
   title: string;
   subtitle?: string;
@@ -24,7 +26,7 @@ export default function SectionHeading({
           {title}
         </h2>
         {linkText && linkHref && (
-          <a
+          <Link
             href={linkHref}
             className="hidden md:inline-flex items-center gap-1 text-sm text-text-secondary hover:text-accent transition-colors"
           >
@@ -44,7 +46,7 @@ export default function SectionHeading({
                 strokeLinejoin="round"
               />
             </svg>
-          </a>
+          </Link>
         )}
       </div>
       {subtitle && (

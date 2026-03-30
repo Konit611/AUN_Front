@@ -1,4 +1,4 @@
-import Button from "@/app/components/ui/button";
+import LinkButton from "@/app/components/ui/link-button";
 
 export default function BottomCTASection() {
   return (
@@ -16,7 +16,7 @@ export default function BottomCTASection() {
           あなたの好みや今日の気分に合わせた最適な日本酒をAIがセレクトします。
         </p>
 
-        <Button variant="primary" size="lg" href="/diagnosis" className="md:px-12 md:py-6 md:text-xl">
+        <LinkButton variant="primary" size="lg" href="/diagnosis" className="md:px-12 md:py-6 md:text-xl">
           タイプ診断をする
           <svg
             width="16"
@@ -33,7 +33,7 @@ export default function BottomCTASection() {
               strokeLinejoin="round"
             />
           </svg>
-        </Button>
+        </LinkButton>
       </div>
     </section>
   );

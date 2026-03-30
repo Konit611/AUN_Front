@@ -1,4 +1,5 @@
-import Button from "@/app/components/ui/button";
+import Link from "next/link";
+import LinkButton from "@/app/components/ui/link-button";
 
 const navLinks = [
   { label: "ホーム", href: "/" },
@@ -12,28 +13,28 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-bg/95 backdrop-blur-sm">
       <nav className="flex items-center justify-between px-6 md:px-12 h-16 md:h-[92px] max-w-[1280px] mx-auto">
         {/* Logo */}
-        <a href="/" className="font-display font-bold text-2xl md:text-[28px] text-text-primary">
+        <Link href="/" className="font-display font-bold text-2xl md:text-[28px] text-text-primary">
           AUN
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <ul className="hidden md:flex items-center gap-10">
           {navLinks.map((link) => (
             <li key={link.href}>
-              <a
+              <Link
                 href={link.href}
                 className="font-body text-base text-text-primary hover:text-accent transition-colors"
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
 
         {/* CTA */}
-        <Button variant="primary" size="sm" href="/diagnosis">
+        <LinkButton variant="primary" size="sm" href="/diagnosis">
           タイプ診断
-        </Button>
+        </LinkButton>
       </nav>
       <div className="h-px bg-border" />
     </header>

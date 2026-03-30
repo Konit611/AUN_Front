@@ -1,4 +1,4 @@
-import Button from "@/app/components/ui/button";
+import LinkButton from "@/app/components/ui/link-button";
 
 export default function HeroSection() {
   return (
@@ -20,12 +20,12 @@ export default function HeroSection() {
             日常を彩る、洗練された一献の提案。
           </p>
           <div className="hidden md:flex gap-4 pt-6">
-            <Button variant="primary" size="lg" href="/pairings">
+            <LinkButton variant="primary" size="lg" href="/pairings">
               ペアリングを探す
-            </Button>
-            <Button variant="secondary" size="lg" href="/breweries">
+            </LinkButton>
+            <LinkButton variant="secondary" size="lg" href="/breweries">
               蔵元を知る
-            </Button>
+            </LinkButton>
           </div>
         </div>
 
