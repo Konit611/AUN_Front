@@ -30,33 +30,36 @@ const navItems = [
     ),
   },
   {
-    label: "記録",
-    href: "/records",
+    label: "読みもの",
+    href: "/articles",
     icon: (
-      <svg width="21" height="21" viewBox="0 0 21 21" fill="none">
-        <rect
-          x="2"
-          y="2"
-          width="17"
-          height="17"
-          rx="2"
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path
+          d="M2 3C2 2.44772 2.44772 2 3 2H8V16H3C2.44772 16 2 15.5523 2 15V3Z"
           stroke="currentColor"
           strokeWidth="1.5"
+          strokeLinejoin="round"
         />
-        <path d="M7 7h7M7 10.5h7M7 14h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path
+          d="M8 2H15C15.5523 2 16 2.44772 16 3V15C16 15.5523 15.5523 16 15 16H8V2Z"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
       </svg>
     ),
   },
   {
-    label: "タイプ診断",
-    href: "/diagnosis",
+    label: "マイページ",
+    href: "/mypage",
     icon: (
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="6" r="4" stroke="currentColor" strokeWidth="1.5" />
         <path
-          d="M8 1L10 6H15L11 9.5L12.5 15L8 11.5L3.5 15L5 9.5L1 6H6L8 1Z"
+          d="M2 16C2 13.2386 4.23858 11 7 11H11C13.7614 11 16 13.2386 16 16"
           stroke="currentColor"
           strokeWidth="1.5"
-          strokeLinejoin="round"
+          strokeLinecap="round"
         />
       </svg>
     ),

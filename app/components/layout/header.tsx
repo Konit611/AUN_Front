@@ -4,8 +4,8 @@ import LinkButton from "@/app/components/ui/link-button";
 const navLinks = [
   { label: "ホーム", href: "/" },
   { label: "日本酒図鑑", href: "/encyclopedia" },
-  { label: "ストーリー", href: "/story" },
-  { label: "AUN ブログ", href: "/blog" },
+  { label: "読みもの", href: "/articles" },
+  { label: "マイページ", href: "/mypage" },
 ];
 
 export default function Header() {
