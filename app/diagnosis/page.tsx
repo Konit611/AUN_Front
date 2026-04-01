@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { calculatePersonaCode } from "@/app/lib/persona";
 import QuizHeader from "@/app/components/quiz/quiz-header";
 import QuizProgress from "@/app/components/quiz/quiz-progress";
 import QuizChoiceButton from "@/app/components/quiz/quiz-choice-button";
@@ -109,7 +110,9 @@ export default function DiagnosisPage() {
           setDirection("next");
           setCurrentIndex((prev) => prev + 1);
         } else {
-          // TODO: Navigate to results page
+          const finalAnswers = { ...answers, [question.id]: choiceId };
+          const code = calculatePersonaCode(finalAnswers);
+          router.push(`/result/${code}`);
         }
         setTransitioning(false);
       }, 400);
