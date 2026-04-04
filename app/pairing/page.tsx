@@ -40,7 +40,7 @@ function FilterChip({
 
 function PairingCardMobile({ item }: { item: PairingGuideItem }) {
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4 shadow-[0px_4px_20px_0px_rgba(43,58,103,0.03)]">
+    <Link href={`/pairing/${item.id}`} className="group block bg-surface border border-border rounded-2xl p-4 shadow-[0px_4px_20px_0px_rgba(43,58,103,0.03)] hover:border-accent transition-colors">
       <div className="flex gap-2 mb-2">
         <span className="px-2 py-0.5 text-[10px] font-body font-bold tracking-tight rounded-full bg-surface-raised text-accent uppercase">
           {item.temperature}
@@ -69,31 +69,22 @@ function PairingCardMobile({ item }: { item: PairingGuideItem }) {
       </p>
 
       <div className="flex justify-end mt-4">
-        <Link
-          href="#"
-          className="font-body font-bold text-sm text-accent flex items-center gap-1"
-        >
-          購入する
+        <span className="font-body font-bold text-sm text-accent flex items-center gap-1 group-hover:text-accent-hover transition-colors">
+          詳しく見る
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <path
-              d="M3 1L7 5L3 9"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+            <path d="M3 1L7 5L3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-        </Link>
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }
 
 function PairingCardDesktop({ item }: { item: PairingGuideItem }) {
   return (
-    <div className="bg-surface border border-border/20 rounded-tl-[48px] overflow-hidden">
+    <Link href={`/pairing/${item.id}`} className="group block bg-surface border border-border/20 rounded-tl-[48px] overflow-hidden hover:border-accent transition-colors">
       <div className="relative h-[360px] lg:h-[420px] bg-surface-raised overflow-hidden flex items-center justify-center">
-        <span className="text-8xl">{item.emoji}</span>
+        <span className="text-8xl group-hover:scale-110 transition-transform">{item.emoji}</span>
         <div className="absolute top-6 right-6 flex flex-col gap-2">
           <span className="px-3 py-1 text-[10px] font-body font-bold tracking-wider rounded-full bg-accent/90 text-white backdrop-blur-sm uppercase">
             {item.season}
@@ -113,23 +104,14 @@ function PairingCardDesktop({ item }: { item: PairingGuideItem }) {
         <p className="font-body text-sm text-text-secondary leading-relaxed pt-2">
           {item.description}
         </p>
-        <Link
-          href="#"
-          className="font-body font-bold text-xs text-accent tracking-wider uppercase flex items-center gap-2 pt-6"
-        >
-          購入する
+        <span className="font-body font-bold text-xs text-accent tracking-wider uppercase flex items-center gap-2 pt-6 group-hover:text-accent-hover transition-colors">
+          詳しく見る
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <path
-              d="M3 1L7 5L3 9"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+            <path d="M3 1L7 5L3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-        </Link>
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }
 
