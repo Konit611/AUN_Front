@@ -1,23 +1,10 @@
-import Link from "next/link";
 import NewEntryForm from "@/app/components/mypage/new-entry-form";
+import DetailHeader from "@/app/components/layout/detail-header";
 
 export default function NewEntryPage() {
   return (
     <div className="bg-bg min-h-screen">
-      {/* Mobile header */}
-      <div className="md:hidden flex items-center justify-between px-6 py-4">
-        <Link href="/mypage" className="p-2" aria-label="戻る">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" className="text-accent">
-            <path d="M10 2L4 8l6 6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </Link>
-        <h1 className="font-display font-bold text-lg text-accent tracking-tight">
-          新しい記録
-        </h1>
-        <button className="font-display font-bold text-lg text-accent">
-          保存
-        </button>
-      </div>
+      <DetailHeader backHref="/mypage" title="新しい記録" />
 
       {/* Desktop title */}
       <div className="hidden md:flex flex-col items-center gap-4 pt-12 pb-4">

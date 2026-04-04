@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import DetailHeader from "@/app/components/layout/detail-header";
 import {
   getPairingById,
   getCategoryForPairing,
@@ -27,18 +28,7 @@ export default async function PairingDetailPage({
 
   return (
     <div className="bg-bg min-h-screen">
-      {/* ── Mobile Header ─────────────────────────── */}
-      <div className="md:hidden flex items-center justify-between px-6 py-4">
-        <Link href="/pairing" className="p-2" aria-label="戻る">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" className="text-accent">
-            <path d="M10 2L4 8l6 6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </Link>
-        <h1 className="font-display font-bold text-lg text-accent tracking-tight">
-          ペアリング詳細
-        </h1>
-        <div className="w-10" />
-      </div>
+      <DetailHeader backHref="/pairing" />
 
       {/* ── Hero ──────────────────────────────────── */}
       <div className="bg-surface-raised">
@@ -58,7 +48,7 @@ export default async function PairingDetailPage({
             <span className="font-bold text-accent">{pairing.foodName}</span>
           </nav>
 
-          <div className="flex flex-col md:flex-row md:items-center gap-8 md:gap-16 pt-6 md:pt-12 pb-10 md:pb-16">
+          <div className="flex flex-col md:flex-row md:items-center gap-8 md:gap-16 pt-6 md:pt-12 pb-10 md:pb-32 md:pb-16">
             {/* Text */}
             <div className="flex-1 flex flex-col gap-4">
               <div className="flex flex-wrap gap-2">

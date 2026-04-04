@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import DetailHeader from "@/app/components/layout/detail-header";
 import {
   getAllArticles,
   getArticleBySlug,
@@ -67,6 +68,7 @@ export default async function ArticleDetailPage({
 
   return (
     <div className="min-h-screen bg-bg">
+      <DetailHeader backHref="/articles" />
       {/* Hero */}
       <div className="bg-surface-raised">
         <div className="max-w-[1280px] mx-auto px-6 md:px-12">

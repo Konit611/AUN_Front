@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import LinkButton from "@/app/components/ui/link-button";
 
 const navLinks = [
@@ -9,9 +12,26 @@ const navLinks = [
   { label: "マイページ", href: "/mypage" },
 ];
 
+/** Detail pages: hide the default header on mobile */
+const detailPatterns = [
+  /^\/encyclopedia\/.+/,
+  /^\/articles\/.+/,
+  /^\/pairing\/.+/,
+  /^\/mypage\/.+/,
+  /^\/result\/.+/,
+  /^\/diagnosis/,
+];
+
 export default function Header() {
+  const pathname = usePathname();
+  const isDetail = detailPatterns.some((p) => p.test(pathname));
+
   return (
-    <header className="sticky top-0 z-50 bg-bg/95 backdrop-blur-sm">
+    <header
+      className={`sticky top-0 z-50 bg-bg/95 backdrop-blur-sm ${
+        isDetail ? "hidden md:block" : ""
+      }`}
+    >
       <nav className="flex items-center justify-between px-6 md:px-12 h-16 md:h-[92px] max-w-[1280px] mx-auto">
         {/* Logo */}
         <Link href="/" className="font-display font-bold text-2xl md:text-[28px] text-text-primary">

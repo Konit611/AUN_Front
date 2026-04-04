@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getSakeDetail } from "@/app/lib/mock-sake-detail";
+import DetailHeader from "@/app/components/layout/detail-header";
 import DetailHero from "@/app/components/encyclopedia/detail-hero";
 import DetailSpecs from "@/app/components/encyclopedia/detail-specs";
 import DetailPairings from "@/app/components/encyclopedia/detail-pairings";
@@ -19,7 +20,8 @@ export default async function SakeDetailPage({ params }: SakeDetailPageProps) {
 
   return (
     <div className="flex flex-col">
-      <div className="px-6 md:px-0 pt-4 md:pt-0 pb-44 md:pb-0">
+      <DetailHeader backHref="/encyclopedia" />
+      <div className="px-6 md:px-0 pt-4 md:pt-0 pb-32 md:pb-0">
         <DetailHero sake={sake} />
 
         <div className="mt-12 md:mt-0">
