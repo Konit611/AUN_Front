@@ -5,6 +5,7 @@ const navLinks = [
   { label: "ホーム", href: "/" },
   { label: "日本酒図鑑", href: "/encyclopedia" },
   { label: "読みもの", href: "/articles" },
+  { label: "ペアリングガイド", href: "/pairing" },
   { label: "マイページ", href: "/mypage" },
 ];
 

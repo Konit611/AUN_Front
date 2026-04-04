@@ -50,6 +50,25 @@ const navItems = [
     ),
   },
   {
+    label: "ペアリング",
+    href: "/pairing",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path
+          d="M5 1V4C5 6.20914 6.79086 8 9 8C11.2091 8 13 6.20914 13 4V1"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path d="M9 8V14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M6 17H12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M9 14V17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M5 4H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
     label: "マイページ",
     href: "/mypage",
     icon: (
