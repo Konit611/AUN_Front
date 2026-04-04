@@ -45,7 +45,7 @@ export default function DetailSpecs({ sake }: DetailSpecsProps) {
 
       {/* Desktop */}
       <div className="hidden md:block bg-surface-raised px-8 py-24">
-        <div className="grid grid-cols-3 gap-12">
+        <div className="grid grid-cols-3 gap-12 max-w-[1280px] mx-auto">
           <div className="col-span-2 grid grid-cols-2 gap-x-8 gap-y-12">
             {specs.map((spec) => (
               <div key={spec.label} className="flex flex-col gap-3">

@@ -46,7 +46,7 @@ export default function DetailPairings({
       </div>
 
       {/* Desktop */}
-      <div className="hidden md:flex flex-col gap-12 max-w-[1536px] px-8 py-24">
+      <div className="hidden md:flex flex-col gap-12 max-w-[1280px] mx-auto px-8 py-24">
         <div className="flex flex-col gap-2">
           <span className="font-body font-bold text-xs text-accent/60 tracking-[2.4px] uppercase">
             Food Recommendations

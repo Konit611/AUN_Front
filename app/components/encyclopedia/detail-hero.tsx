@@ -37,7 +37,7 @@ export default function DetailHero({ sake }: DetailHeroProps) {
       </div>
 
       {/* Desktop */}
-      <div className="hidden md:grid grid-cols-2 gap-16 max-w-[1536px] px-8 pt-16 pb-24">
+      <div className="hidden md:grid grid-cols-2 gap-16 max-w-[1280px] mx-auto px-8 pt-16 pb-24">
         <div className="flex flex-col gap-10 justify-center">
           <div className="flex flex-col gap-4">
             <div className="flex gap-3">
