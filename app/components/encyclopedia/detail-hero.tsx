@@ -1,4 +1,4 @@
-import type { SakeDetail } from "@/app/lib/mock-sake-detail";
+import type { SakeDetail } from "@/app/lib/types";
 
 interface DetailHeroProps {
   sake: SakeDetail;

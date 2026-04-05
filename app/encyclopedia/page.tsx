@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { getAllSakeIds, getSakeDetail } from "@/app/lib/mock-sake-detail";
+import { apiFetch } from "@/app/lib/api";
+import type { SakeListItem } from "@/app/lib/types";
 
-export default function EncyclopediaPage() {
-  const ids = getAllSakeIds();
-  const sakes = ids.map((id) => getSakeDetail(id)!);
+export default async function EncyclopediaPage() {
+  const sakes = await apiFetch<SakeListItem[]>("/sake");
 
   return (
     <div className="px-6 md:px-8 pt-8 md:pt-16 pb-24 md:pb-20 max-w-[1536px] mx-auto">

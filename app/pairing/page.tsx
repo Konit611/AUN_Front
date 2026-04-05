@@ -1,17 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  getAllCategories,
-  getSeasonFilters,
-  getFoodCategoryFilters,
-  type PairingGuideItem,
-} from "@/app/lib/mock-pairing-guide";
-
-const categories = getAllCategories();
-const seasonFilters = getSeasonFilters();
-const foodCategoryFilters = getFoodCategoryFilters();
+import { apiFetch } from "@/app/lib/api";
+import type {
+  PairingCategory,
+  PairingGuideItem,
+  SeasonFilter,
+  FoodCategoryFilter,
+} from "@/app/lib/types";
 
 /* ── Shared Components ─────────────────────────────────── */
 
@@ -115,18 +112,25 @@ function PairingCardDesktop({ item }: { item: PairingGuideItem }) {
   );
 }
 
-/* ── Filtering Logic ───────────────────────────────────── */
+/* ── Page ──────────────────────────────────────────────── */
 
-function useFilteredItems(
-  activeSeason: string,
-  activeFood: string | null
-) {
+export default function PairingGuidePage() {
+  const [categories, setCategories] = useState<PairingCategory[]>([]);
+  const [seasonFilters, setSeasonFilters] = useState<SeasonFilter[]>([]);
+  const [foodCategoryFilters, setFoodCategoryFilters] = useState<FoodCategoryFilter[]>([]);
+  const [activeSeason, setActiveSeason] = useState("all");
+  const [activeFood, setActiveFood] = useState<string | null>(null);
+
+  useEffect(() => {
+    apiFetch<PairingCategory[]>("/pairing-guide/categories").then(setCategories);
+    apiFetch<SeasonFilter[]>("/pairing-guide/filters/season").then(setSeasonFilters);
+    apiFetch<FoodCategoryFilter[]>("/pairing-guide/filters/food").then(setFoodCategoryFilters);
+  }, []);
+
   const displayed = activeFood
     ? categories.filter((c) => c.slug === activeFood)
     : categories;
-
   const seasonFilter = seasonFilters.find((f) => f.key === activeSeason);
-
   const items = displayed.flatMap((cat) =>
     cat.items.filter((item) => {
       if (activeSeason === "all" || activeSeason === "your-type") return true;
@@ -135,17 +139,7 @@ function useFilteredItems(
         : true;
     })
   );
-
-  return { items, count: items.length };
-}
-
-/* ── Page ──────────────────────────────────────────────── */
-
-export default function PairingGuidePage() {
-  const [activeSeason, setActiveSeason] = useState("all");
-  const [activeFood, setActiveFood] = useState<string | null>(null);
-
-  const { items, count } = useFilteredItems(activeSeason, activeFood);
+  const count = items.length;
 
   const title = activeFood
     ? categories.find((c) => c.slug === activeFood)?.title ?? "ペアリングガイド"

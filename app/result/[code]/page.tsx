@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getPersona, getPersonaColors, isValidCode } from "@/app/lib/persona";
-import { getResultData } from "@/app/lib/mock-data";
+import { apiFetch } from "@/app/lib/api";
+import type { ResultData } from "@/app/lib/types";
 import HeroSection from "@/app/components/result/hero-section";
 import SakeRecommendationsSection from "@/app/components/result/sake-recommendations-section";
 import PairingsSection from "@/app/components/result/pairings-section";
@@ -19,7 +20,7 @@ export default async function ResultPage({ params }: ResultPageProps) {
 
   const persona = getPersona(code)!;
   const colors = getPersonaColors(code);
-  const data = getResultData(code);
+  const data = await apiFetch<ResultData>(`/quiz-results/${code}`);
 
   return (
     <div className="flex flex-col gap-0">

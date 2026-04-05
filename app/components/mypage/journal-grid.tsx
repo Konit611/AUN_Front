@@ -1,4 +1,4 @@
-import type { JournalEntry } from "@/app/lib/mock-journal";
+import type { JournalEntry } from "@/app/lib/types";
 import JournalCard from "./journal-card";
 
 interface JournalGridProps {

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { getSakeDetail } from "@/app/lib/mock-sake-detail";
+import { apiFetch } from "@/app/lib/api";
+import type { SakeDetail } from "@/app/lib/types";
 import DetailHeader from "@/app/components/layout/detail-header";
 import DetailHero from "@/app/components/encyclopedia/detail-hero";
 import DetailSpecs from "@/app/components/encyclopedia/detail-specs";
@@ -12,9 +13,11 @@ interface SakeDetailPageProps {
 
 export default async function SakeDetailPage({ params }: SakeDetailPageProps) {
   const { id } = await params;
-  const sake = getSakeDetail(id);
 
-  if (!sake) {
+  let sake: SakeDetail;
+  try {
+    sake = await apiFetch<SakeDetail>(`/sake/${id}`);
+  } catch {
     notFound();
   }
 

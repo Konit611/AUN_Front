@@ -1,11 +1,12 @@
-import { mockJournalEntries } from "@/app/lib/mock-journal";
+import { apiFetch } from "@/app/lib/api";
+import type { JournalEntry } from "@/app/lib/types";
 import JournalEmptyState from "@/app/components/mypage/journal-empty-state";
 import JournalHeader from "@/app/components/mypage/journal-header";
 import JournalGrid from "@/app/components/mypage/journal-grid";
 import FabButton from "@/app/components/mypage/fab-button";
 
-export default function MyPage() {
-  const entries = mockJournalEntries;
+export default async function MyPage() {
+  const entries = await apiFetch<JournalEntry[]>("/journal");
   const isEmpty = entries.length === 0;
 
   return (

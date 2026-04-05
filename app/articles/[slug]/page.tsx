@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import DetailHeader from "@/app/components/layout/detail-header";
+import { apiFetch } from "@/app/lib/api";
 import {
-  getAllArticles,
-  getArticleBySlug,
   formatDate,
+  type Article,
+  type ArticleListItem,
   type ArticleBlock,
-} from "@/app/lib/mock-articles";
+} from "@/app/lib/types";
 
 interface ArticleDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -55,14 +56,17 @@ export default async function ArticleDetailPage({
   params,
 }: ArticleDetailPageProps) {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
 
-  if (!article) {
+  let article: Article;
+  try {
+    article = await apiFetch<Article>(`/articles/${slug}`);
+  } catch {
     notFound();
   }
 
   // Find related articles (same category, excluding current)
-  const related = getAllArticles()
+  const allArticles = await apiFetch<ArticleListItem[]>("/articles");
+  const related = allArticles
     .filter((a) => a.category === article.category && a.slug !== article.slug)
     .slice(0, 2);
 

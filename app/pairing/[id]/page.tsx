@@ -1,11 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import DetailHeader from "@/app/components/layout/detail-header";
-import {
-  getPairingById,
-  getCategoryForPairing,
-  getAllPairings,
-} from "@/app/lib/mock-pairing-guide";
+import { apiFetch } from "@/app/lib/api";
+import type { PairingGuideItem, PairingCategory } from "@/app/lib/types";
 
 interface PairingDetailPageProps {
   params: Promise<{ id: string }>;
@@ -15,13 +12,17 @@ export default async function PairingDetailPage({
   params,
 }: PairingDetailPageProps) {
   const { id } = await params;
-  const pairing = getPairingById(id);
 
-  if (!pairing) {
+  let pairing: PairingGuideItem;
+  try {
+    pairing = await apiFetch<PairingGuideItem>(`/pairing-guide/items/${id}`);
+  } catch {
     notFound();
   }
 
-  const category = getCategoryForPairing(id);
+  // Find related items from the same category
+  const categories = await apiFetch<PairingCategory[]>("/pairing-guide/categories");
+  const category = categories.find((c) => c.items.some((item) => item.id === id));
   const related = (category?.items ?? [])
     .filter((item) => item.id !== id)
     .slice(0, 2);

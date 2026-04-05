@@ -1,4 +1,4 @@
-import type { SakeDetailPairing } from "@/app/lib/mock-sake-detail";
+import type { SakeDetailPairing } from "@/app/lib/types";
 
 interface DetailPairingsProps {
   pairings: SakeDetailPairing[];

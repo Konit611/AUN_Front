@@ -1,4 +1,4 @@
-import type { PairingRecommendation } from "@/app/lib/mock-data";
+import type { PairingRecommendation } from "@/app/lib/types";
 
 interface PairingCardProps {
   pairing: PairingRecommendation;

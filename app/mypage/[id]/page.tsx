@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import DetailHeader from "@/app/components/layout/detail-header";
-import { getJournalEntry, type SakeProfile } from "@/app/lib/mock-journal";
+import { apiFetch } from "@/app/lib/api";
+import type { JournalEntry } from "@/app/lib/types";
 import StarRating from "@/app/components/mypage/star-rating";
 
 interface JournalDetailPageProps {
@@ -12,9 +13,11 @@ export default async function JournalDetailPage({
   params,
 }: JournalDetailPageProps) {
   const { id } = await params;
-  const entry = getJournalEntry(id);
 
-  if (!entry) {
+  let entry: JournalEntry;
+  try {
+    entry = await apiFetch<JournalEntry>(`/journal/${id}`);
+  } catch {
     notFound();
   }
 

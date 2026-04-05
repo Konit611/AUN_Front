@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { JournalEntry } from "@/app/lib/mock-journal";
+import type { JournalEntry } from "@/app/lib/types";
 import StarRating from "./star-rating";
 
 interface JournalCardProps {

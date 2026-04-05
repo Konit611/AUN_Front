@@ -1,4 +1,4 @@
-import type { SakeRecommendation } from "@/app/lib/mock-data";
+import type { SakeRecommendation } from "@/app/lib/types";
 import SakeCard from "./sake-card";
 
 interface SakeRecommendationsSectionProps {

@@ -1,16 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { apiFetch } from "@/app/lib/api";
 import {
-  getAllArticles,
-  getCategoryFilters,
   formatDate,
-  type Article,
-} from "@/app/lib/mock-articles";
+  type ArticleListItem,
+  type CategoryFilter,
+} from "@/app/lib/types";
 
-const articles = getAllArticles();
-const categoryFilters = getCategoryFilters();
+type Article = ArticleListItem;
 
 function ArticleCardFeatured({ article }: { article: Article }) {
   return (
@@ -98,7 +97,14 @@ function ArticleCard({ article }: { article: Article }) {
 }
 
 export default function ArticlesPage() {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [categoryFilters, setCategoryFilters] = useState<CategoryFilter[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
+
+  useEffect(() => {
+    apiFetch<Article[]>("/articles").then(setArticles);
+    apiFetch<CategoryFilter[]>("/articles/filters").then(setCategoryFilters);
+  }, []);
 
   const filtered =
     activeCategory === "all"
