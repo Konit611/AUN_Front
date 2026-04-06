@@ -45,7 +45,7 @@ const PERSONAS: Record<string, Persona> = {
     name: "穏やかな美学者",
     description:
       "甘口で重厚、それでいて香りは控えめ。落ち着いた美しさを愛する人。",
-    compatibleCode: "Derb",
+    compatibleCode: "DERB",
     compatibleName: "DERBタイプ",
     compatibleDescription:
       "辛口でどっしりとした味わいの「DERB」タイプと共に、深い旨味の世界を探求できます。",

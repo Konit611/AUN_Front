@@ -25,7 +25,7 @@ export default function DetailHeader({ title, backHref }: DetailHeaderProps) {
           onClick={handleBack}
           className="flex items-center gap-1.5 py-2 pr-3 text-accent font-body text-sm cursor-pointer"
         >
-          <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true">
             <path
               d="M8.5 1L1.5 8L8.5 15"
               stroke="currentColor"

@@ -16,10 +16,17 @@ export default function QuizProgress({ current, total }: QuizProgressProps) {
           {current} / {total}
         </span>
       </div>
-      <div className="w-full h-[3px] bg-border rounded-full">
+      <div
+        role="progressbar"
+        aria-valuenow={current}
+        aria-valuemin={0}
+        aria-valuemax={total}
+        aria-label={`質問 ${current}/${total}`}
+        className="w-full h-[3px] bg-border rounded-full"
+      >
         <div
           className="h-full bg-accent rounded-full transition-all duration-300 ease-in-out"
-          style={{ width: `${percentage}%` }}
+          style={{ width: `${total > 0 ? percentage : 0}%` }}
         />
       </div>
     </div>

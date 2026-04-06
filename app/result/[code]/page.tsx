@@ -18,9 +18,18 @@ export default async function ResultPage({ params }: ResultPageProps) {
     notFound();
   }
 
-  const persona = getPersona(code)!;
+  const persona = getPersona(code);
+  if (!persona) {
+    notFound();
+  }
   const colors = getPersonaColors(code);
-  const data = await apiFetch<ResultData>(`/quiz-results/${code}`);
+
+  let data: ResultData;
+  try {
+    data = await apiFetch<ResultData>(`/quiz-results/${code}`);
+  } catch {
+    notFound();
+  }
 
   return (
     <div className="flex flex-col gap-0">

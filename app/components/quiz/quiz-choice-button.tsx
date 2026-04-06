@@ -12,6 +12,7 @@ export default function QuizChoiceButton({
   return (
     <button
       onClick={onClick}
+      aria-pressed={selected}
       className={`w-full flex items-center justify-between p-[26px] rounded-xl border-2 bg-surface text-left cursor-pointer transition-all duration-200 ${
         selected
           ? "border-text-primary shadow-[4px_4px_0px_0px_var(--color-text-primary)]"

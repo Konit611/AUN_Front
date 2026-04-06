@@ -102,8 +102,8 @@ export default function ArticlesPage() {
   const [activeCategory, setActiveCategory] = useState("all");
 
   useEffect(() => {
-    apiFetch<Article[]>("/articles").then(setArticles);
-    apiFetch<CategoryFilter[]>("/articles/filters").then(setCategoryFilters);
+    apiFetch<Article[]>("/articles").then(setArticles).catch(() => {});
+    apiFetch<CategoryFilter[]>("/articles/filters").then(setCategoryFilters).catch(() => {});
   }, []);
 
   const filtered =

@@ -1,11 +1,15 @@
-"use client";
-
 interface HeroSectionProps {
   typeCode: string;
   typeName: string;
   description: string;
   gradientFrom: string;
   gradientTo: string;
+}
+
+const CSS_COLOR_RE = /^#[0-9a-fA-F]{3,8}$/;
+
+function sanitizeColor(color: string, fallback: string): string {
+  return CSS_COLOR_RE.test(color) ? color : fallback;
 }
 
 export default function HeroSection({
@@ -15,11 +19,14 @@ export default function HeroSection({
   gradientFrom,
   gradientTo,
 }: HeroSectionProps) {
+  const safeFrom = sanitizeColor(gradientFrom, "#C2685A");
+  const safeTo = sanitizeColor(gradientTo, "#7B5EA7");
+
   return (
     <section
       className="flex flex-col items-center justify-center overflow-hidden px-6 py-24 md:px-8 md:py-32"
       style={{
-        background: `linear-gradient(135deg, ${gradientFrom} 0%, ${gradientTo} 100%)`,
+        background: `linear-gradient(135deg, ${safeFrom} 0%, ${safeTo} 100%)`,
       }}
     >
       {/* Mobile */}

@@ -14,14 +14,15 @@ export default async function PairingDetailPage({
   const { id } = await params;
 
   let pairing: PairingGuideItem;
+  let categories: PairingCategory[];
   try {
-    pairing = await apiFetch<PairingGuideItem>(`/pairing-guide/items/${id}`);
+    [pairing, categories] = await Promise.all([
+      apiFetch<PairingGuideItem>(`/pairing-guide/items/${id}`),
+      apiFetch<PairingCategory[]>("/pairing-guide/categories"),
+    ]);
   } catch {
     notFound();
   }
-
-  // Find related items from the same category
-  const categories = await apiFetch<PairingCategory[]>("/pairing-guide/categories");
   const category = categories.find((c) => c.items.some((item) => item.id === id));
   const related = (category?.items ?? [])
     .filter((item) => item.id !== id)
@@ -49,7 +50,7 @@ export default async function PairingDetailPage({
             <span className="font-bold text-accent">{pairing.foodName}</span>
           </nav>
 
-          <div className="flex flex-col md:flex-row md:items-center gap-8 md:gap-16 pt-6 md:pt-12 pb-10 md:pb-32 md:pb-16">
+          <div className="flex flex-col md:flex-row md:items-center gap-8 md:gap-16 pt-6 md:pt-12 pb-10 md:pb-16">
             {/* Text */}
             <div className="flex-1 flex flex-col gap-4">
               <div className="flex flex-wrap gap-2">

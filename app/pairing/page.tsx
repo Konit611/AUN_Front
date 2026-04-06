@@ -122,9 +122,9 @@ export default function PairingGuidePage() {
   const [activeFood, setActiveFood] = useState<string | null>(null);
 
   useEffect(() => {
-    apiFetch<PairingCategory[]>("/pairing-guide/categories").then(setCategories);
-    apiFetch<SeasonFilter[]>("/pairing-guide/filters/season").then(setSeasonFilters);
-    apiFetch<FoodCategoryFilter[]>("/pairing-guide/filters/food").then(setFoodCategoryFilters);
+    apiFetch<PairingCategory[]>("/pairing-guide/categories").then(setCategories).catch(() => {});
+    apiFetch<SeasonFilter[]>("/pairing-guide/filters/season").then(setSeasonFilters).catch(() => {});
+    apiFetch<FoodCategoryFilter[]>("/pairing-guide/filters/food").then(setFoodCategoryFilters).catch(() => {});
   }, []);
 
   const displayed = activeFood

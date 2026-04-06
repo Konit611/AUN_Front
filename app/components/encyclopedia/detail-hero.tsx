@@ -61,13 +61,13 @@ export default function DetailHero({ sake }: DetailHeroProps) {
             <p className="font-body text-base leading-[26px] text-text-secondary">
               {sake.description}
             </p>
-            <a
-              href="#"
-              className="inline-flex items-center gap-3 bg-accent text-white font-body font-bold text-lg px-10 py-5 rounded-full w-fit hover:bg-accent-hover transition-colors"
+            <span
+              className="inline-flex items-center gap-3 bg-accent/40 text-white font-body font-bold text-lg px-10 py-5 rounded-full w-fit cursor-not-allowed"
+              aria-disabled="true"
             >
-              購入する
+              購入する（準備中）
               <ArrowRight />
-            </a>
+            </span>
           </div>
         </div>
         <div className="flex flex-col items-center justify-center relative">

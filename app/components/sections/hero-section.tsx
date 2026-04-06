@@ -20,10 +20,10 @@ export default function HeroSection() {
             日常を彩る、洗練された一献の提案。
           </p>
           <div className="hidden md:flex gap-4 pt-6">
-            <LinkButton variant="primary" size="lg" href="/pairings">
+            <LinkButton variant="primary" size="lg" href="/pairing">
               ペアリングを探す
             </LinkButton>
-            <LinkButton variant="secondary" size="lg" href="/breweries">
+            <LinkButton variant="secondary" size="lg" href="/encyclopedia">
               蔵元を知る
             </LinkButton>
           </div>

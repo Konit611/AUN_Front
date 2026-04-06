@@ -155,5 +155,6 @@ export interface JournalEntry {
 
 export function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 }

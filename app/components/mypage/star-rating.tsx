@@ -37,6 +37,7 @@ export default function StarRating({
           type="button"
           disabled={!interactive}
           onClick={() => onChange?.(star)}
+          aria-label={`${star}つ星`}
           className={`${interactive ? "hover:scale-110 transition-transform" : ""} disabled:cursor-default`}
         >
           <StarIcon filled={star <= rating} size={size} />

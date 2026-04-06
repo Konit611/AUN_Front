@@ -16,7 +16,7 @@ export default function FindByFoodSection() {
             </Button>
           ))}
           {/* More icon button */}
-          <button className="inline-flex items-center justify-center w-[59px] h-9 md:w-auto md:h-auto md:px-12 md:py-5 rounded-full bg-accent-light text-accent hover:bg-accent/10 transition-colors cursor-pointer">
+          <button aria-label="もっと見る" className="inline-flex items-center justify-center w-[59px] h-9 md:w-auto md:h-auto md:px-12 md:py-5 rounded-full bg-accent-light text-accent hover:bg-accent/10 transition-colors cursor-pointer">
             <svg
               width="15"
               height="16"

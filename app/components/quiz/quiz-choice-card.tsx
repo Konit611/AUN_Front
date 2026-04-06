@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface QuizChoiceCardProps {
   text: string;
   image?: string;
@@ -16,6 +18,7 @@ export default function QuizChoiceCard({
   return (
     <button
       onClick={onClick}
+      aria-pressed={selected}
       className={`relative flex flex-col items-start p-[43px] rounded-[20px] border-3 bg-surface text-left cursor-pointer transition-all duration-200 ${
         selected
           ? "border-accent shadow-[4px_4px_0px_0px_var(--color-accent)]"
@@ -23,7 +26,7 @@ export default function QuizChoiceCard({
       }`}
     >
       {/* Selection indicator */}
-      <span className={`absolute top-6 right-6 ${selected ? "text-accent" : "text-border"}`}>
+      <span className={`absolute top-6 right-6 ${selected ? "text-accent" : "text-border"}`} aria-hidden="true">
         {selected ? (
           <svg width="27" height="27" viewBox="0 0 27 27" fill="none">
             <circle cx="13.5" cy="13.5" r="13.5" fill="currentColor" />
@@ -50,11 +53,12 @@ export default function QuizChoiceCard({
 
       {/* Image */}
       {image && (
-        <div className="mb-8 size-24 border-2 border-text-primary overflow-hidden grayscale">
-          <img
+        <div className="mb-8 size-24 border-2 border-text-primary overflow-hidden grayscale relative">
+          <Image
             src={image}
             alt={imageAlt || ""}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         </div>
       )}

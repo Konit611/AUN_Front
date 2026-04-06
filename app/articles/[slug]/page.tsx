@@ -49,6 +49,8 @@ function BlockRenderer({ block }: { block: ArticleBlock }) {
           </cite>
         </blockquote>
       );
+    default:
+      return null;
   }
 }
 
@@ -58,14 +60,15 @@ export default async function ArticleDetailPage({
   const { slug } = await params;
 
   let article: Article;
+  let allArticles: ArticleListItem[];
   try {
-    article = await apiFetch<Article>(`/articles/${slug}`);
+    [article, allArticles] = await Promise.all([
+      apiFetch<Article>(`/articles/${slug}`),
+      apiFetch<ArticleListItem[]>("/articles"),
+    ]);
   } catch {
     notFound();
   }
-
-  // Find related articles (same category, excluding current)
-  const allArticles = await apiFetch<ArticleListItem[]>("/articles");
   const related = allArticles
     .filter((a) => a.category === article.category && a.slug !== article.slug)
     .slice(0, 2);

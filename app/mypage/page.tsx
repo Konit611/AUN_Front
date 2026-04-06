@@ -6,7 +6,12 @@ import JournalGrid from "@/app/components/mypage/journal-grid";
 import FabButton from "@/app/components/mypage/fab-button";
 
 export default async function MyPage() {
-  const entries = await apiFetch<JournalEntry[]>("/journal");
+  let entries: JournalEntry[];
+  try {
+    entries = await apiFetch<JournalEntry[]>("/journal");
+  } catch {
+    entries = [];
+  }
   const isEmpty = entries.length === 0;
 
   return (

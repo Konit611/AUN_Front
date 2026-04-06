@@ -44,7 +44,7 @@ export default function ClassicPairingsSection() {
           title="定番ペアリング"
           subtitle="TIMELESS CLASSICS"
           linkText="すべて見る"
-          linkHref="/pairings"
+          linkHref="/pairing"
         />
 
         <div className="flex flex-col gap-6 md:grid md:grid-cols-2 md:gap-10">

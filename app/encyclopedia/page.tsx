@@ -3,7 +3,12 @@ import { apiFetch } from "@/app/lib/api";
 import type { SakeListItem } from "@/app/lib/types";
 
 export default async function EncyclopediaPage() {
-  const sakes = await apiFetch<SakeListItem[]>("/sake");
+  let sakes: SakeListItem[];
+  try {
+    sakes = await apiFetch<SakeListItem[]>("/sake");
+  } catch {
+    sakes = [];
+  }
 
   return (
     <div className="px-6 md:px-8 pt-8 md:pt-16 pb-24 md:pb-20 max-w-[1536px] mx-auto">

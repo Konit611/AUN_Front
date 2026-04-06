@@ -117,7 +117,7 @@ export default function DiagnosisPage() {
         setTransitioning(false);
       }, 400);
     },
-    [currentIndex, total, question.id, transitioning],
+    [currentIndex, total, question.id, transitioning, answers, router],
   );
 
   const handleClose = useCallback(() => {

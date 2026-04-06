@@ -89,7 +89,7 @@ export default function BottomNavBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface border-t border-border">
+    <nav aria-label="モバイルナビゲーション" className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface border-t border-border">
       <ul className="flex items-center justify-around h-20 px-4">
         {navItems.map((item) => {
           const isActive =
@@ -99,6 +99,7 @@ export default function BottomNavBar() {
             <li key={item.href}>
               <Link
                 href={item.href}
+                aria-current={isActive ? "page" : undefined}
                 className={`flex flex-col items-center gap-1.5 text-[11px] ${
                   isActive
                     ? "text-accent font-medium"
