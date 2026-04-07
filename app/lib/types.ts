@@ -1,3 +1,13 @@
+/* ── Pagination ───────────────────────────────── */
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 /* ── Articles ──────────────────────────────────── */
 
 export type ArticleBlock =
@@ -27,6 +37,12 @@ export interface CategoryFilter {
   label: string;
 }
 
+export interface ArticlesResponse extends PaginatedResponse<ArticleListItem> {
+  filters: {
+    categories: CategoryFilter[];
+  };
+}
+
 /* ── Pairing Guide ────────────────────────────── */
 
 export interface PairingGuideItem {
@@ -46,11 +62,13 @@ export interface PairingGuideItem {
   sakeImage: string;
 }
 
+export type PairingGuideListItem = Omit<PairingGuideItem, "body" | "whyItWorks" | "howToEnjoy">;
+
 export interface PairingCategory {
   slug: string;
   label: string;
   title: string;
-  items: PairingGuideItem[];
+  items: PairingGuideListItem[];
 }
 
 export interface SeasonFilter {
@@ -62,6 +80,14 @@ export interface SeasonFilter {
 export interface FoodCategoryFilter {
   key: string;
   label: string;
+}
+
+export interface PairingGuideResponse {
+  categories: PairingCategory[];
+  filters: {
+    seasons: SeasonFilter[];
+    foodCategories: FoodCategoryFilter[];
+  };
 }
 
 /* ── Sake Encyclopedia ────────────────────────── */

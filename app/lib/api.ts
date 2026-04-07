@@ -22,3 +22,22 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
   if (!res.ok) throw new Error(`API request failed with status ${res.status}`);
   return res.json();
 }
+
+export async function apiPut<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(`${BASE_URL}/api/v1${path}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error(`API request failed with status ${res.status}`);
+  return res.json();
+}
+
+export async function apiDelete(path: string): Promise<void> {
+  const res = await fetch(`${BASE_URL}/api/v1${path}`, {
+    method: "DELETE",
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error(`API request failed with status ${res.status}`);
+}

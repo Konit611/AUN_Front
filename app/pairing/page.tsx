@@ -5,7 +5,8 @@ import Link from "next/link";
 import { apiFetch } from "@/app/lib/api";
 import type {
   PairingCategory,
-  PairingGuideItem,
+  PairingGuideListItem,
+  PairingGuideResponse,
   SeasonFilter,
   FoodCategoryFilter,
 } from "@/app/lib/types";
@@ -35,7 +36,7 @@ function FilterChip({
   );
 }
 
-function PairingCardMobile({ item }: { item: PairingGuideItem }) {
+function PairingCardMobile({ item }: { item: PairingGuideListItem }) {
   return (
     <Link href={`/pairing/${item.id}`} className="group block bg-surface border border-border rounded-2xl p-4 shadow-[0px_4px_20px_0px_rgba(43,58,103,0.03)] hover:border-accent transition-colors">
       <div className="flex gap-2 mb-2">
@@ -77,7 +78,7 @@ function PairingCardMobile({ item }: { item: PairingGuideItem }) {
   );
 }
 
-function PairingCardDesktop({ item }: { item: PairingGuideItem }) {
+function PairingCardDesktop({ item }: { item: PairingGuideListItem }) {
   return (
     <Link href={`/pairing/${item.id}`} className="group block bg-surface border border-border/20 rounded-tl-[48px] overflow-hidden hover:border-accent transition-colors">
       <div className="relative h-[360px] lg:h-[420px] bg-surface-raised overflow-hidden flex items-center justify-center">
@@ -122,9 +123,13 @@ export default function PairingGuidePage() {
   const [activeFood, setActiveFood] = useState<string | null>(null);
 
   useEffect(() => {
-    apiFetch<PairingCategory[]>("/pairing-guide/categories").then(setCategories).catch(() => {});
-    apiFetch<SeasonFilter[]>("/pairing-guide/filters/season").then(setSeasonFilters).catch(() => {});
-    apiFetch<FoodCategoryFilter[]>("/pairing-guide/filters/food").then(setFoodCategoryFilters).catch(() => {});
+    apiFetch<PairingGuideResponse>("/pairing-guide")
+      .then((data) => {
+        setCategories(data.categories);
+        setSeasonFilters(data.filters.seasons);
+        setFoodCategoryFilters(data.filters.foodCategories);
+      })
+      .catch(() => {});
   }, []);
 
   const displayed = activeFood

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { apiFetch } from "@/app/lib/api";
-import type { SakeListItem } from "@/app/lib/types";
+import type { SakeListItem, PaginatedResponse } from "@/app/lib/types";
 
 export default async function EncyclopediaPage() {
   let sakes: SakeListItem[];
   try {
-    sakes = await apiFetch<SakeListItem[]>("/sake");
+    const data = await apiFetch<PaginatedResponse<SakeListItem>>("/sake");
+    sakes = data.items;
   } catch {
     sakes = [];
   }

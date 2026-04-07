@@ -6,6 +6,7 @@ import { apiFetch } from "@/app/lib/api";
 import {
   formatDate,
   type ArticleListItem,
+  type ArticlesResponse,
   type CategoryFilter,
 } from "@/app/lib/types";
 
@@ -102,8 +103,12 @@ export default function ArticlesPage() {
   const [activeCategory, setActiveCategory] = useState("all");
 
   useEffect(() => {
-    apiFetch<Article[]>("/articles").then(setArticles).catch(() => {});
-    apiFetch<CategoryFilter[]>("/articles/filters").then(setCategoryFilters).catch(() => {});
+    apiFetch<ArticlesResponse>("/articles")
+      .then((data) => {
+        setArticles(data.items);
+        setCategoryFilters(data.filters.categories);
+      })
+      .catch(() => {});
   }, []);
 
   const filtered =

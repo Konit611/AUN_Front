@@ -1,5 +1,5 @@
 import { apiFetch } from "@/app/lib/api";
-import type { JournalEntry } from "@/app/lib/types";
+import type { JournalEntry, PaginatedResponse } from "@/app/lib/types";
 import JournalEmptyState from "@/app/components/mypage/journal-empty-state";
 import JournalHeader from "@/app/components/mypage/journal-header";
 import JournalGrid from "@/app/components/mypage/journal-grid";
@@ -8,7 +8,8 @@ import FabButton from "@/app/components/mypage/fab-button";
 export default async function MyPage() {
   let entries: JournalEntry[];
   try {
-    entries = await apiFetch<JournalEntry[]>("/journal");
+    const data = await apiFetch<PaginatedResponse<JournalEntry>>("/journal");
+    entries = data.items;
   } catch {
     entries = [];
   }
