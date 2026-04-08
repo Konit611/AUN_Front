@@ -1,20 +1,28 @@
 import type { Metadata } from "next";
-import { Shippori_Mincho, Zen_Maru_Gothic } from "next/font/google";
+import localFont from "next/font/local";
 import Header from "@/app/components/layout/header";
 import Footer from "@/app/components/layout/footer";
 import BottomNavBar from "@/app/components/layout/bottom-nav-bar";
 import "./globals.css";
 
-const shipporiMincho = Shippori_Mincho({
-  variable: "--font-shippori-mincho",
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
+const zenKakuGothicNew = localFont({
+  variable: "--font-zen-kaku-gothic-new",
+  src: [
+    { path: "./fonts/ZenKakuGothicNew-Light.ttf", weight: "300" },
+    { path: "./fonts/ZenKakuGothicNew-Regular.ttf", weight: "400" },
+    { path: "./fonts/ZenKakuGothicNew-Medium.ttf", weight: "500" },
+    { path: "./fonts/ZenKakuGothicNew-Bold.ttf", weight: "700" },
+  ],
 });
 
-const zenMaruGothic = Zen_Maru_Gothic({
+const zenMaruGothic = localFont({
   variable: "--font-zen-maru-gothic",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
+  src: [
+    { path: "./fonts/ZenMaruGothic-Light.ttf", weight: "300" },
+    { path: "./fonts/ZenMaruGothic-Regular.ttf", weight: "400" },
+    { path: "./fonts/ZenMaruGothic-Medium.ttf", weight: "500" },
+    { path: "./fonts/ZenMaruGothic-Bold.ttf", weight: "700" },
+  ],
 });
 
 export const metadata: Metadata = {
@@ -31,7 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
-      className={`${shipporiMincho.variable} ${zenMaruGothic.variable} h-full antialiased`}
+      className={`${zenKakuGothicNew.variable} ${zenMaruGothic.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Header />
