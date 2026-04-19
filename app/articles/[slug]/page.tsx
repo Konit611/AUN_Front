@@ -5,7 +5,7 @@ import { apiFetch } from "@/app/lib/api";
 import {
   formatDate,
   type Article,
-  type ArticleListItem,
+  type ArticlesResponse,
   type ArticleBlock,
 } from "@/app/lib/types";
 
@@ -60,16 +60,16 @@ export default async function ArticleDetailPage({
   const { slug } = await params;
 
   let article: Article;
-  let allArticles: ArticleListItem[];
+  let articlesResponse: ArticlesResponse;
   try {
-    [article, allArticles] = await Promise.all([
+    [article, articlesResponse] = await Promise.all([
       apiFetch<Article>(`/articles/${slug}`),
-      apiFetch<ArticleListItem[]>("/articles"),
+      apiFetch<ArticlesResponse>("/articles"),
     ]);
   } catch {
     notFound();
   }
-  const related = allArticles
+  const related = articlesResponse.items
     .filter((a) => a.category === article.category && a.slug !== article.slug)
     .slice(0, 2);
 
