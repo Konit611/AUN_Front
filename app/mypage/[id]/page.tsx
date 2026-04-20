@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import DetailHeader from "@/app/components/layout/detail-header";
 import { apiFetch } from "@/app/lib/api";
@@ -13,10 +14,11 @@ export default async function JournalDetailPage({
   params,
 }: JournalDetailPageProps) {
   const { id } = await params;
+  const cookie = (await cookies()).toString();
 
   let entry: JournalEntry;
   try {
-    entry = await apiFetch<JournalEntry>(`/journal/${id}`);
+    entry = await apiFetch<JournalEntry>(`/journal/${id}`, { cookie });
   } catch {
     notFound();
   }

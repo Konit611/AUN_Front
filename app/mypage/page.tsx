@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { apiFetch } from "@/app/lib/api";
 import type { JournalEntry, PaginatedResponse } from "@/app/lib/types";
 import JournalEmptyState from "@/app/components/mypage/journal-empty-state";
@@ -6,9 +7,12 @@ import JournalGrid from "@/app/components/mypage/journal-grid";
 import FabButton from "@/app/components/mypage/fab-button";
 
 export default async function MyPage() {
+  const cookie = (await cookies()).toString();
   let entries: JournalEntry[];
   try {
-    const data = await apiFetch<PaginatedResponse<JournalEntry>>("/journal");
+    const data = await apiFetch<PaginatedResponse<JournalEntry>>("/journal", {
+      cookie,
+    });
     entries = data.items;
   } catch {
     entries = [];

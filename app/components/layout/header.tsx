@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import LinkButton from "@/app/components/ui/link-button";
+import { logout, useMe } from "@/app/lib/auth";
 
 const navLinks = [
   { label: "ホーム", href: "/" },
@@ -24,7 +25,19 @@ const detailPatterns = [
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, refetch } = useMe();
   const isDetail = detailPatterns.some((p) => p.test(pathname));
+
+  async function onLogout() {
+    try {
+      await logout();
+    } finally {
+      await refetch();
+      router.push("/");
+      router.refresh();
+    }
+  }
 
   return (
     <header
@@ -52,10 +65,32 @@ export default function Header() {
           ))}
         </ul>
 
-        {/* CTA */}
-        <LinkButton variant="primary" size="sm" href="/diagnosis">
-          タイプ診断
-        </LinkButton>
+        {/* CTA + auth */}
+        <div className="flex items-center gap-4">
+          {user ? (
+            <div className="hidden md:flex items-center gap-3">
+              <span className="font-body text-sm text-text-secondary">
+                {user.username}
+              </span>
+              <button
+                onClick={onLogout}
+                className="font-body text-sm text-text-secondary hover:text-accent transition-colors cursor-pointer"
+              >
+                ログアウト
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="hidden md:inline font-body text-sm text-text-primary hover:text-accent transition-colors"
+            >
+              ログイン
+            </Link>
+          )}
+          <LinkButton variant="primary" size="sm" href="/diagnosis">
+            タイプ診断
+          </LinkButton>
+        </div>
       </nav>
       <div className="h-px bg-border" />
     </header>
