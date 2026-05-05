@@ -1,12 +1,19 @@
 import Link from "next/link";
+import ShareButtons from "./share-buttons";
 
 interface CompatibilitySectionProps {
+  userCode: string;
+  userName: string;
+  userDescription: string;
   compatibleCode: string;
   compatibleName: string;
   compatibleDescription: string;
 }
 
 export default function CompatibilitySection({
+  userCode,
+  userName,
+  userDescription,
   compatibleCode,
   compatibleName,
   compatibleDescription,
@@ -33,10 +40,12 @@ export default function CompatibilitySection({
             <p className="font-body text-sm text-text-secondary text-center leading-7 mb-8">
               {compatibleDescription}
             </p>
-            <button className="w-full flex items-center justify-center gap-3 py-4 rounded-full bg-accent text-white font-body font-bold text-sm tracking-[1.4px] shadow-md">
-              <ShareIcon />
-              この相性をシェアする
-            </button>
+            <ShareButtons
+              typeCode={userCode}
+              typeName={userName}
+              description={userDescription}
+              variant="compatibility"
+            />
           </div>
 
           <div className="flex flex-col items-center gap-8 mt-16">
@@ -103,21 +112,3 @@ export default function CompatibilitySection({
   );
 }
 
-function ShareIcon() {
-  return (
-    <svg
-      width="14"
-      height="15"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
-      <polyline points="16 6 12 2 8 6" />
-      <line x1="12" y1="2" x2="12" y2="15" />
-    </svg>
-  );
-}
