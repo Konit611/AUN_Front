@@ -14,13 +14,18 @@ export default function JournalCard({ entry }: JournalCardProps) {
       <article className="flex flex-col gap-3">
         {/* Image */}
         <div className="bg-surface border border-border rounded-[48px] overflow-hidden group-hover:border-accent transition-colors">
-          <div className="aspect-square bg-surface-raised flex items-center justify-center">
-            {entry.imagePath ? (
-              <div className="w-full h-full bg-surface-raised" />
-            ) : (
+          {entry.imagePath ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={entry.imagePath}
+              alt={entry.sakeName}
+              className="w-full aspect-square object-cover"
+            />
+          ) : (
+            <div className="aspect-square bg-surface-raised flex items-center justify-center">
               <span className="text-text-muted text-sm">No Image</span>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Info */}

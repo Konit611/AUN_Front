@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiPost } from "@/app/lib/api";
+import { apiPost, apiPut } from "@/app/lib/api";
+import { compressToDataURL } from "@/app/lib/image-upload";
+import type { JournalEntry } from "@/app/lib/types";
 import StarRating from "./star-rating";
 
 const profileAxes = [
@@ -20,28 +22,52 @@ function labelClass() {
   return "font-body font-medium text-sm md:font-bold text-text-secondary md:text-accent tracking-wide";
 }
 
-export default function NewEntryForm() {
+export interface NewEntryFormProps {
+  initialEntry?: JournalEntry;
+}
+
+export default function NewEntryForm({ initialEntry }: NewEntryFormProps = {}) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const isEdit = Boolean(initialEntry);
+
   const [submitting, setSubmitting] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [sakeName, setSakeName] = useState("");
-  const [brewery, setBrewery] = useState("");
-  const [aroma, setAroma] = useState("");
-  const [taste, setTaste] = useState("");
-  const [finish, setFinish] = useState("");
-  const [temperature, setTemperature] = useState("");
-  const [pairing, setPairing] = useState("");
-  const [memo, setMemo] = useState("");
-  const [date, setDate] = useState("");
-  const [profile, setProfile] = useState({
-    sweetDry: 50,
-    heavyLight: 50,
-    richCalm: 50,
-    boldSmooth: 50,
-  });
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [rating, setRating] = useState(initialEntry?.rating ?? 0);
+  const [sakeName, setSakeName] = useState(initialEntry?.sakeName ?? "");
+  const [brewery, setBrewery] = useState(initialEntry?.brewery ?? "");
+  const [aroma, setAroma] = useState(initialEntry?.tasting.aroma ?? "");
+  const [taste, setTaste] = useState(initialEntry?.tasting.taste ?? "");
+  const [finish, setFinish] = useState(initialEntry?.tasting.finish ?? "");
+  const [temperature, setTemperature] = useState(initialEntry?.tasting.temperature ?? "");
+  const [pairing, setPairing] = useState(initialEntry?.tasting.pairing ?? "");
+  const [memo, setMemo] = useState(initialEntry?.tasting.memo ?? "");
+  const [date, setDate] = useState(initialEntry?.date ?? "");
+  const [imagePath, setImagePath] = useState<string | undefined>(initialEntry?.imagePath);
+  const [profile, setProfile] = useState(
+    initialEntry?.tasting.profile ?? {
+      sweetDry: 50,
+      heavyLight: 50,
+      richCalm: 50,
+      boldSmooth: 50,
+    },
+  );
 
   const updateAxis = (key: string, value: number) => {
     setProfile((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handlePickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setImageError(null);
+    try {
+      const dataUrl = await compressToDataURL(file);
+      setImagePath(dataUrl);
+    } catch (err) {
+      setImageError(err instanceof Error ? err.message : "画像の読み込みに失敗しました。");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,23 +75,32 @@ export default function NewEntryForm() {
     if (!sakeName.trim() || !date) return;
 
     setSubmitting(true);
+    const payload = {
+      sakeName: sakeName.trim(),
+      brewery: brewery.trim() || undefined,
+      date,
+      rating,
+      imagePath: imagePath ?? undefined,
+      tasting: {
+        profile,
+        aroma: aroma.trim(),
+        taste: taste.trim(),
+        finish: finish.trim(),
+        temperature: temperature.trim(),
+        pairing: pairing.trim() || undefined,
+        memo: memo.trim() || undefined,
+      },
+    };
+
     try {
-      await apiPost("/journal", {
-        sakeName: sakeName.trim(),
-        brewery: brewery.trim() || undefined,
-        date,
-        rating,
-        tasting: {
-          profile,
-          aroma: aroma.trim(),
-          taste: taste.trim(),
-          finish: finish.trim(),
-          temperature: temperature.trim(),
-          pairing: pairing.trim() || undefined,
-          memo: memo.trim() || undefined,
-        },
-      });
-      router.push("/mypage");
+      if (isEdit && initialEntry) {
+        await apiPut(`/journal/${initialEntry.id}`, payload);
+        router.push(`/mypage/${initialEntry.id}`);
+      } else {
+        await apiPost("/journal", payload);
+        router.push("/mypage");
+      }
+      router.refresh();
     } catch {
       setSubmitting(false);
     }
@@ -105,17 +140,55 @@ export default function NewEntryForm() {
       {/* Photo Upload */}
       <div className="flex flex-col gap-2 md:gap-3">
         <label className={labelClass()}>写真</label>
-        <button
-          type="button"
-          className="w-full bg-surface-raised/50 border-2 border-dashed border-border md:border-border/40 rounded-2xl md:rounded-[48px] py-16 md:py-20 flex flex-col items-center justify-center gap-2 hover:border-accent/30 transition-colors"
-        >
-          <svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-text-secondary" aria-hidden="true">
-            <rect x="1" y="3" width="22" height="18" rx="3" />
-            <circle cx="12" cy="12" r="4" />
-            <circle cx="17" cy="7" r="1" fill="currentColor" />
-          </svg>
-          <span className="text-sm text-text-secondary font-body">写真を追加</span>
-        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handlePickImage}
+        />
+        {imagePath ? (
+          <div className="flex flex-col gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imagePath}
+              alt="アップロードされた写真"
+              className="w-full max-h-[320px] object-cover rounded-2xl md:rounded-[32px] border border-border"
+            />
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-2 rounded-full bg-surface-raised text-accent text-sm font-body font-bold hover:bg-accent/10 transition-colors"
+              >
+                変更
+              </button>
+              <button
+                type="button"
+                onClick={() => setImagePath(undefined)}
+                className="px-4 py-2 rounded-full bg-surface-raised text-text-secondary text-sm font-body font-bold hover:bg-red-50 hover:text-red-700 transition-colors"
+              >
+                削除
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full bg-surface-raised/50 border-2 border-dashed border-border md:border-border/40 rounded-2xl md:rounded-[48px] py-16 md:py-20 flex flex-col items-center justify-center gap-2 hover:border-accent/30 transition-colors"
+          >
+            <svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-text-secondary" aria-hidden="true">
+              <rect x="1" y="3" width="22" height="18" rx="3" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17" cy="7" r="1" fill="currentColor" />
+            </svg>
+            <span className="text-sm text-text-secondary font-body">写真を追加</span>
+          </button>
+        )}
+        {imageError && (
+          <p className="text-xs font-body text-red-700">{imageError}</p>
+        )}
       </div>
 
       {/* Sake Profile — 4 Axes */}
@@ -256,7 +329,11 @@ export default function NewEntryForm() {
           disabled={submitting}
           className="px-16 py-5 bg-accent text-white font-body font-bold text-lg rounded-full shadow-[0_20px_25px_-5px_rgba(20,36,80,0.1)] hover:bg-accent-hover transition-colors cursor-pointer disabled:opacity-50"
         >
-          {submitting ? "保存中..." : "保存する"}
+          {submitting
+            ? "保存中..."
+            : isEdit
+              ? "変更を保存"
+              : "保存する"}
         </button>
       </div>
 
@@ -267,7 +344,11 @@ export default function NewEntryForm() {
           disabled={submitting}
           className="w-full py-4 bg-accent text-white font-body font-bold text-base rounded-full shadow-[0_8px_30px_rgba(43,58,103,0.2)] hover:bg-accent-hover transition-colors disabled:opacity-50"
         >
-          {submitting ? "保存中..." : "保存する"}
+          {submitting
+            ? "保存中..."
+            : isEdit
+              ? "変更を保存"
+              : "保存する"}
         </button>
       </div>
     </form>

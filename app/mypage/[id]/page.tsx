@@ -5,6 +5,7 @@ import DetailHeader from "@/app/components/layout/detail-header";
 import { apiFetch } from "@/app/lib/api";
 import type { JournalEntry } from "@/app/lib/types";
 import StarRating from "@/app/components/mypage/star-rating";
+import JournalActions from "@/app/components/mypage/journal-actions";
 
 interface JournalDetailPageProps {
   params: Promise<{ id: string }>;
@@ -45,9 +46,18 @@ export default async function JournalDetailPage({
       <div className="max-w-[720px] mx-auto px-6 md:px-8 pt-6 md:pt-12 pb-32 md:pb-24">
         {/* Image */}
         <div className="bg-surface border border-border rounded-[48px] overflow-hidden">
-          <div className="aspect-[4/3] bg-surface-raised flex items-center justify-center">
-            <span className="text-6xl">🍶</span>
-          </div>
+          {entry.imagePath ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={entry.imagePath}
+              alt={entry.sakeName}
+              className="w-full aspect-[4/3] object-cover"
+            />
+          ) : (
+            <div className="aspect-[4/3] bg-surface-raised flex items-center justify-center">
+              <span className="text-6xl">🍶</span>
+            </div>
+          )}
         </div>
 
         {/* Content */}
@@ -113,6 +123,8 @@ export default async function JournalDetailPage({
               </p>
             </div>
           )}
+
+          <JournalActions entryId={entry.id} />
         </div>
       </div>
     </div>

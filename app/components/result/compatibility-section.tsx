@@ -12,7 +12,7 @@ export default function CompatibilitySection({
   compatibleDescription,
 }: CompatibilitySectionProps) {
   return (
-    <section className="px-6 py-24 md:px-8 md:py-0">
+    <section className="px-6 py-24 md:px-8 md:py-20">
       <div className="max-w-[1280px] mx-auto">
         {/* Mobile */}
         <div className="md:hidden">
@@ -81,6 +81,22 @@ export default function CompatibilitySection({
               {compatibleCode}
             </span>
           </div>
+        </div>
+
+        {/* PC bottom CTAs */}
+        <div className="hidden md:flex items-center justify-center gap-8 mt-16">
+          <Link
+            href="/diagnosis"
+            className="px-10 py-3 rounded-full border border-text-secondary text-text-secondary font-body text-sm tracking-[1.4px] hover:border-accent hover:text-accent transition-colors"
+          >
+            もう一度診断する
+          </Link>
+          <Link
+            href="/"
+            className="font-body font-bold text-sm text-accent tracking-[1.4px] underline underline-offset-4 decoration-accent/20 hover:decoration-accent transition-colors"
+          >
+            ホームに戻る
+          </Link>
         </div>
       </div>
     </section>

@@ -90,6 +90,28 @@ export interface PairingGuideResponse {
   };
 }
 
+/* ── Home ──────────────────────────────────────── */
+
+export interface HomePairingCard {
+  id: string;
+  emoji: string;
+  food: string;
+  sake: string;
+  temperature: string;
+  description: string;
+}
+
+export interface HomeData {
+  seasonal: {
+    label: string;
+    items: HomePairingCard[];
+  };
+  classic: {
+    items: HomePairingCard[];
+  };
+  foodCategories: FoodCategoryFilter[];
+}
+
 /* ── Sake Encyclopedia ────────────────────────── */
 
 export interface SakeListItem {

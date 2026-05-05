@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { apiFetch } from "@/app/lib/api";
 import type { SakeListItem, PaginatedResponse } from "@/app/lib/types";
+import EmptyState from "@/app/components/ui/empty-state";
 
 export default async function EncyclopediaPage() {
   let sakes: SakeListItem[];
@@ -22,6 +23,14 @@ export default async function EncyclopediaPage() {
         </h1>
       </div>
 
+      {sakes.length === 0 ? (
+        <EmptyState
+          title="日本酒データを表示できませんでした"
+          description="一時的に情報を取得できませんでした。しばらくしてから再度お試しください。"
+          actionLabel="ホームに戻る"
+          actionHref="/"
+        />
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         {sakes.map((sake) => (
           <Link
@@ -57,6 +66,7 @@ export default async function EncyclopediaPage() {
           </Link>
         ))}
       </div>
+      )}
     </div>
   );
 }

@@ -10,6 +10,7 @@ import type {
   SeasonFilter,
   FoodCategoryFilter,
 } from "@/app/lib/types";
+import EmptyState from "@/app/components/ui/empty-state";
 
 /* ── Shared Components ─────────────────────────────────── */
 
@@ -121,6 +122,7 @@ export default function PairingGuidePage() {
   const [foodCategoryFilters, setFoodCategoryFilters] = useState<FoodCategoryFilter[]>([]);
   const [activeSeason, setActiveSeason] = useState("all");
   const [activeFood, setActiveFood] = useState<string | null>(null);
+  const [loadState, setLoadState] = useState<"loading" | "loaded" | "error">("loading");
 
   useEffect(() => {
     apiFetch<PairingGuideResponse>("/pairing-guide")
@@ -128,8 +130,9 @@ export default function PairingGuidePage() {
         setCategories(data.categories);
         setSeasonFilters(data.filters.seasons);
         setFoodCategoryFilters(data.filters.foodCategories);
+        setLoadState("loaded");
       })
-      .catch(() => {});
+      .catch(() => setLoadState("error"));
   }, []);
 
   const displayed = activeFood
@@ -149,6 +152,19 @@ export default function PairingGuidePage() {
   const title = activeFood
     ? categories.find((c) => c.slug === activeFood)?.title ?? "ペアリングガイド"
     : "ペアリングガイド";
+
+  if (loadState === "error") {
+    return (
+      <div className="min-h-screen bg-bg">
+        <EmptyState
+          title="ペアリング情報を表示できませんでした"
+          description="一時的に情報を取得できませんでした。しばらくしてから再度お試しください。"
+          actionLabel="ホームに戻る"
+          actionHref="/"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-bg">
