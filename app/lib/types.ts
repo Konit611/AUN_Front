@@ -13,18 +13,19 @@ export interface PaginatedResponse<T> {
 export type ArticleBlock =
   | { type: "paragraph"; text: string }
   | { type: "heading"; text: string }
-  | { type: "image"; emoji: string; caption: string }
+  | { type: "image"; emoji: string; caption: string; image_url?: string | null }
   | { type: "quote"; text: string; author: string };
 
 export interface ArticleListItem {
   slug: string;
   title: string;
   subtitle: string;
-  category: "brewery" | "sake-knowledge" | "culture";
+  category: string;
   categoryLabel: string;
   date: string;
   readTime: string;
   emoji: string;
+  heroImageUrl: string | null;
   excerpt: string;
 }
 
@@ -58,8 +59,9 @@ export interface PairingGuideItem {
   body: string;
   whyItWorks: string;
   howToEnjoy: string;
-  foodImage: string;
-  sakeImage: string;
+  foodImage: string | null;
+  sakeImage: string | null;
+  heroImage: string | null;
 }
 
 export type PairingGuideListItem = Omit<PairingGuideItem, "body" | "whyItWorks" | "howToEnjoy">;

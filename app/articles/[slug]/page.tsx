@@ -30,8 +30,17 @@ function BlockRenderer({ block }: { block: ArticleBlock }) {
     case "image":
       return (
         <figure className="my-2">
-          <div className="bg-surface-raised rounded-tl-[32px] rounded-br-[32px] h-[200px] md:h-[320px] flex items-center justify-center">
-            <span className="text-6xl md:text-7xl">{block.emoji}</span>
+          <div className="bg-surface-raised rounded-tl-[32px] rounded-br-[32px] h-[200px] md:h-[320px] flex items-center justify-center overflow-hidden">
+            {block.image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={block.image_url}
+                alt={block.caption}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-6xl md:text-7xl">{block.emoji}</span>
+            )}
           </div>
           <figcaption className="font-body text-xs text-text-muted text-center mt-3">
             {block.caption}
@@ -122,8 +131,17 @@ export default async function ArticleDetailPage({
             </div>
             {/* Image */}
             <div className="md:w-[320px] lg:w-[400px] shrink-0">
-              <div className="bg-bg rounded-tl-[48px] rounded-br-[48px] h-[200px] md:h-[300px] flex items-center justify-center">
-                <span className="text-7xl md:text-8xl">{article.emoji}</span>
+              <div className="bg-bg rounded-tl-[48px] rounded-br-[48px] h-[200px] md:h-[300px] flex items-center justify-center overflow-hidden">
+                {article.heroImageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={article.heroImageUrl}
+                    alt={article.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-7xl md:text-8xl">{article.emoji}</span>
+                )}
               </div>
             </div>
           </div>

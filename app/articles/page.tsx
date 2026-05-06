@@ -20,10 +20,19 @@ function ArticleCardFeatured({ article }: { article: Article }) {
     >
       <div className="md:flex">
         {/* Image */}
-        <div className="md:w-1/2 h-[240px] md:h-[400px] bg-surface-raised flex items-center justify-center">
-          <span className="text-7xl md:text-8xl group-hover:scale-110 transition-transform">
-            {article.emoji}
-          </span>
+        <div className="md:w-1/2 h-[240px] md:h-[400px] bg-surface-raised flex items-center justify-center overflow-hidden">
+          {article.heroImageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={article.heroImageUrl}
+              alt={article.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+            />
+          ) : (
+            <span className="text-7xl md:text-8xl group-hover:scale-110 transition-transform">
+              {article.emoji}
+            </span>
+          )}
         </div>
         {/* Content */}
         <div className="md:w-1/2 p-6 md:p-10 flex flex-col justify-center gap-4">
@@ -68,10 +77,19 @@ function ArticleCard({ article }: { article: Article }) {
       className="group block bg-surface border border-border rounded-tl-[32px] rounded-br-[32px] md:rounded-tl-[48px] md:rounded-br-[48px] overflow-hidden hover:border-accent transition-colors"
     >
       {/* Image */}
-      <div className="h-[180px] md:h-[240px] bg-surface-raised flex items-center justify-center">
-        <span className="text-5xl md:text-6xl group-hover:scale-110 transition-transform">
-          {article.emoji}
-        </span>
+      <div className="h-[180px] md:h-[240px] bg-surface-raised flex items-center justify-center overflow-hidden">
+        {article.heroImageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={article.heroImageUrl}
+            alt={article.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+          />
+        ) : (
+          <span className="text-5xl md:text-6xl group-hover:scale-110 transition-transform">
+            {article.emoji}
+          </span>
+        )}
       </div>
       {/* Content */}
       <div className="p-5 md:p-6 flex flex-col gap-3">
