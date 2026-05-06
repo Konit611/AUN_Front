@@ -49,8 +49,28 @@ export default function Header() {
     >
       <nav className="flex items-center justify-between px-6 md:px-12 h-16 md:h-[92px] max-w-[1280px] mx-auto">
         {/* Logo */}
-        <Link href="/" className="font-display font-bold text-2xl md:text-[28px] text-text-primary">
-          AUN
+        <Link
+          href="/"
+          className="flex items-center gap-2 md:gap-3 text-accent hover:opacity-80 transition-opacity"
+        >
+          <svg
+            viewBox="0 0 400 400"
+            className="w-6 h-6 md:w-7 md:h-7 shrink-0 translate-y-0.5"
+            aria-hidden="true"
+          >
+            <mask id="aun-logo-cutout">
+              <rect width="400" height="400" fill="white" />
+              <circle cx="200" cy="200" r="60" fill="black" />
+            </mask>
+            <path
+              d="M0 100C0 44.7715 44.7715 0 100 0H400V300C400 355.228 355.228 400 300 400H0V100Z"
+              fill="currentColor"
+              mask="url(#aun-logo-cutout)"
+            />
+          </svg>
+          <span className="font-display font-bold text-3xl md:text-[32px] leading-none">
+            AUN
+          </span>
         </Link>
 
         {/* Desktop Nav */}
