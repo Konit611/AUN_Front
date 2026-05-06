@@ -13,6 +13,7 @@ import type {
 } from "@/app/lib/types";
 import RichEditor, { type RichEditorHandle } from "./rich-editor";
 import PreviewModal from "./preview-modal";
+import Stepper from "./stepper";
 
 // Stitch old (body / why_it_works / how_to_enjoy) into a BlockNote document so
 // pairings authored before the wizard keep their narrative when re-edited.
@@ -208,7 +209,7 @@ export default function PairingForm({ initial }: Props) {
 
   return (
     <form onSubmit={onPublish} className="flex flex-col gap-8">
-      <Stepper current={step} onJump={(n) => setStep(n)} />
+      <Stepper steps={STEPS} current={step} onJump={(n) => setStep(n as 1 | 2 | 3)} />
 
       {step === 1 && (
         <Section title="参照する日本酒・肴">
@@ -465,46 +466,6 @@ export default function PairingForm({ initial }: Props) {
         </div>
       </PreviewModal>
     </form>
-  );
-}
-
-function Stepper({
-  current,
-  onJump,
-}: {
-  current: 1 | 2 | 3;
-  onJump: (n: 1 | 2 | 3) => void;
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      {STEPS.map((s, i) => {
-        const active = s.num === current;
-        const done = s.num < current;
-        return (
-          <div key={s.num} className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => onJump(s.num as 1 | 2 | 3)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full font-body text-xs font-bold tracking-wider transition-colors ${
-                active
-                  ? "bg-accent text-white"
-                  : done
-                    ? "bg-accent/15 text-accent hover:bg-accent/25"
-                    : "bg-surface-raised text-text-muted hover:bg-surface-raised/80"
-              }`}
-            >
-              <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-white/20 text-[10px]">
-                {s.num}
-              </span>
-              {s.label}
-            </button>
-            {i < STEPS.length - 1 && (
-              <span className="w-6 h-px bg-border" aria-hidden />
-            )}
-          </div>
-        );
-      })}
-    </div>
   );
 }
 

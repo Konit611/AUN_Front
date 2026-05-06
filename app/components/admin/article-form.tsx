@@ -12,6 +12,19 @@ import type {
 } from "@/app/lib/types";
 import RichEditor, { type RichEditorHandle } from "./rich-editor";
 import PreviewModal from "./preview-modal";
+import Stepper from "./stepper";
+
+interface Props {
+  initial?: AdminArticle;
+}
+
+const inputCls =
+  "w-full px-3 py-2 rounded-lg border border-border bg-surface font-body text-sm text-text-primary focus:outline-none focus:border-accent transition-colors";
+
+const STEPS = [
+  { num: 1, label: "基本情報" },
+  { num: 2, label: "本文" },
+] as const;
 
 // Convert legacy paragraph/heading/image/quote blocks into BlockNote PartialBlock[]
 // so editing an article authored before BlockNote doesn't drop its body.
@@ -24,19 +37,15 @@ function legacyToBlockNote(blocks: AdminArticleBlock[]): PartialBlock[] {
       return [{ type: "heading", props: { level: 2 }, content: b.text }];
     }
     if (b.type === "image") {
-      const blocks: PartialBlock[] = [];
       if (b.image_url) {
-        blocks.push({
-          type: "image",
-          props: { url: b.image_url, caption: b.caption },
-        });
-      } else {
-        blocks.push({
-          type: "paragraph",
-          content: `${b.emoji} ${b.caption}`,
-        });
+        return [
+          {
+            type: "image",
+            props: { url: b.image_url, caption: b.caption },
+          },
+        ];
       }
-      return blocks;
+      return [{ type: "paragraph", content: `${b.emoji} ${b.caption}` }];
     }
     if (b.type === "quote") {
       return [
@@ -48,17 +57,12 @@ function legacyToBlockNote(blocks: AdminArticleBlock[]): PartialBlock[] {
   });
 }
 
-interface Props {
-  initial?: AdminArticle;
-}
-
-const inputCls =
-  "w-full px-3 py-2 rounded-lg border border-border bg-surface font-body text-sm text-text-primary focus:outline-none focus:border-accent transition-colors";
-
 export default function ArticleForm({ initial }: Props) {
   const router = useRouter();
   const isEdit = Boolean(initial);
   const editorRef = useRef<RichEditorHandle | null>(null);
+
+  const [step, setStep] = useState<1 | 2>(1);
 
   const [slug, setSlug] = useState(initial?.slug ?? "");
   const [title, setTitle] = useState(initial?.title ?? "");
@@ -92,9 +96,14 @@ export default function ArticleForm({ initial }: Props) {
       ? legacyToBlockNote(initial.body)
       : null);
 
+  function step1Valid(): boolean {
+    return Boolean(slug.trim() && title.trim() && categoryId !== "" && date);
+  }
+
   async function buildPayload(asDraft: boolean): Promise<AdminArticleInput | null> {
-    if (categoryId === "") {
-      setError("カテゴリを選択してください");
+    if (!slug.trim() || !title.trim() || categoryId === "" || !date) {
+      setError("slug・タイトル・カテゴリ・日付は下書きでも必須です");
+      setStep(1);
       return null;
     }
     const editor = editorRef.current;
@@ -144,18 +153,13 @@ export default function ArticleForm({ initial }: Props) {
     }
   }
 
-  async function onSubmit(e: React.FormEvent) {
+  async function onPublish(e: React.FormEvent) {
     e.preventDefault();
     await save(false);
   }
 
   async function onSaveDraft() {
     await save(true);
-  }
-
-  function onPreview() {
-    setPreviewHtml(editorRef.current?.getHTML() ?? "");
-    setPreviewOpen(true);
   }
 
   async function onDelete() {
@@ -176,113 +180,140 @@ export default function ArticleForm({ initial }: Props) {
     }
   }
 
-  return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-8">
-      <Section title="基本情報">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="slug (URL用)" required>
-            <input
-              type="text"
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              required
-              maxLength={80}
-              pattern="^[a-z0-9-]+$"
-              placeholder="kubota-brewery-story"
-              disabled={isEdit}
-              className={`${inputCls} ${isEdit ? "opacity-60" : ""}`}
-            />
-          </Field>
-          <Field label="絵文字">
-            <input
-              type="text"
-              value={emoji}
-              onChange={(e) => setEmoji(e.target.value)}
-              maxLength={10}
-              placeholder="🏯"
-              className={`${inputCls} text-2xl w-24`}
-            />
-          </Field>
-          <Field label="タイトル" required>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              maxLength={120}
-              className={inputCls}
-            />
-          </Field>
-          <Field label="サブタイトル">
-            <input
-              type="text"
-              value={subtitle}
-              onChange={(e) => setSubtitle(e.target.value)}
-              className={inputCls}
-            />
-          </Field>
-          <Field label="カテゴリ" required>
-            <select
-              value={categoryId}
-              onChange={(e) =>
-                setCategoryId(e.target.value === "" ? "" : Number(e.target.value))
-              }
-              required
-              className={inputCls}
-            >
-              <option value="">— 選択 —</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.label} ({c.slug})
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="日付" required>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
-              className={inputCls}
-            />
-          </Field>
-          <Field label="読了時間 (例: 8 min)">
-            <input
-              type="text"
-              value={readTime}
-              onChange={(e) => setReadTime(e.target.value)}
-              maxLength={20}
-              className={inputCls}
-            />
-          </Field>
-          <Field label="ヒーロー画像URL">
-            <input
-              type="url"
-              value={heroImageUrl}
-              onChange={(e) => setHeroImageUrl(e.target.value)}
-              placeholder="https://..."
-              className={inputCls}
-            />
-          </Field>
-        </div>
-        <Field label="抜粋 (一覧表示用 1〜2 文)">
-          <textarea
-            value={excerpt}
-            onChange={(e) => setExcerpt(e.target.value)}
-            rows={2}
-            className={`${inputCls} resize-y`}
-          />
-        </Field>
-      </Section>
+  function onPreview() {
+    setPreviewHtml(editorRef.current?.getHTML() ?? "");
+    setPreviewOpen(true);
+  }
 
-      <Section title="本文">
-        <RichEditor
-          ref={editorRef}
-          initialContent={initialBody}
-          uploadPrefix="articles"
-        />
-      </Section>
+  function goNext() {
+    if (step === 1 && !step1Valid()) {
+      setError("slug・タイトル・カテゴリ・日付を入力してください");
+      return;
+    }
+    setError(null);
+    setStep((s) => (s < 2 ? ((s + 1) as 1 | 2) : s));
+  }
+
+  function goPrev() {
+    setError(null);
+    setStep((s) => (s > 1 ? ((s - 1) as 1 | 2) : s));
+  }
+
+  return (
+    <form onSubmit={onPublish} className="flex flex-col gap-8">
+      <Stepper steps={STEPS} current={step} onJump={(n) => setStep(n as 1 | 2)} />
+
+      {step === 1 && (
+        <Section title="基本情報">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="slug (URL用)" required>
+              <input
+                type="text"
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                required
+                maxLength={80}
+                pattern="^[a-z0-9-]+$"
+                placeholder="kubota-brewery-story"
+                disabled={isEdit}
+                className={`${inputCls} ${isEdit ? "opacity-60" : ""}`}
+              />
+            </Field>
+            <Field label="絵文字">
+              <input
+                type="text"
+                value={emoji}
+                onChange={(e) => setEmoji(e.target.value)}
+                maxLength={10}
+                placeholder="🏯"
+                className={`${inputCls} text-2xl w-24`}
+              />
+            </Field>
+            <Field label="タイトル" required>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                maxLength={120}
+                className={inputCls}
+              />
+            </Field>
+            <Field label="サブタイトル">
+              <input
+                type="text"
+                value={subtitle}
+                onChange={(e) => setSubtitle(e.target.value)}
+                className={inputCls}
+              />
+            </Field>
+            <Field label="カテゴリ" required>
+              <select
+                value={categoryId}
+                onChange={(e) =>
+                  setCategoryId(
+                    e.target.value === "" ? "" : Number(e.target.value),
+                  )
+                }
+                required
+                className={inputCls}
+              >
+                <option value="">— 選択 —</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label} ({c.slug})
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="日付" required>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                required
+                className={inputCls}
+              />
+            </Field>
+            <Field label="読了時間 (例: 8 min)">
+              <input
+                type="text"
+                value={readTime}
+                onChange={(e) => setReadTime(e.target.value)}
+                maxLength={20}
+                className={inputCls}
+              />
+            </Field>
+            <Field label="ヒーロー画像URL">
+              <input
+                type="url"
+                value={heroImageUrl}
+                onChange={(e) => setHeroImageUrl(e.target.value)}
+                placeholder="https://..."
+                className={inputCls}
+              />
+            </Field>
+          </div>
+          <Field label="抜粋 (一覧表示用 1〜2 文)">
+            <textarea
+              value={excerpt}
+              onChange={(e) => setExcerpt(e.target.value)}
+              rows={2}
+              className={`${inputCls} resize-y`}
+            />
+          </Field>
+        </Section>
+      )}
+
+      {step === 2 && (
+        <Section title="本文">
+          <RichEditor
+            ref={editorRef}
+            initialContent={initialBody}
+            uploadPrefix="articles"
+          />
+        </Section>
+      )}
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 font-body text-sm">
@@ -303,7 +334,7 @@ export default function ArticleForm({ initial }: Props) {
         ) : (
           <span />
         )}
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <button
             type="button"
             onClick={() => router.push("/admin/articles")}
@@ -312,6 +343,16 @@ export default function ArticleForm({ initial }: Props) {
           >
             キャンセル
           </button>
+          {step > 1 && (
+            <button
+              type="button"
+              onClick={goPrev}
+              disabled={submitting}
+              className="px-5 py-2.5 rounded-full border border-border font-body font-medium text-sm text-text-secondary hover:border-accent hover:text-accent disabled:opacity-50 transition-colors"
+            >
+              前へ
+            </button>
+          )}
           <button
             type="button"
             onClick={onPreview}
@@ -328,13 +369,24 @@ export default function ArticleForm({ initial }: Props) {
           >
             下書き保存
           </button>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"
-          >
-            {submitting ? "保存中..." : isEdit ? "公開更新" : "公開"}
-          </button>
+          {step < 2 ? (
+            <button
+              type="button"
+              onClick={goNext}
+              disabled={submitting}
+              className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"
+            >
+              次へ
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"
+            >
+              {submitting ? "保存中..." : isEdit ? "公開更新" : "公開"}
+            </button>
+          )}
         </div>
       </div>
 
