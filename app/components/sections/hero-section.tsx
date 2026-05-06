@@ -74,13 +74,13 @@ function FeaturedSakeCard({ sake }: { sake: FeaturedSake | null }) {
           )}
           {/* Badge */}
           <span
-            className={`absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${
+            className={`absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${
               sake?.personalized
                 ? "bg-accent text-white"
                 : "bg-white/90 text-accent backdrop-blur-sm"
             }`}
           >
-            {sake?.personalized ? "あなたへの一献" : "今夜の一献"}
+            {sake?.personalized ? "あなたへのおすすめ" : "今日のおすすめ"}
           </span>
         </div>
 
