@@ -21,6 +21,8 @@ function withCookie(options?: ApiOptions): HeadersInit {
   return options?.cookie ? { cookie: options.cookie } : {};
 }
 
+export const AUTH_UNAUTHORIZED_EVENT = "auth:unauthorized";
+
 async function send<T>(url: string, init: RequestInit): Promise<T> {
   const res = await fetch(url, {
     cache: "no-store",
@@ -29,6 +31,12 @@ async function send<T>(url: string, init: RequestInit): Promise<T> {
     ...init,
   });
   if (!res.ok) {
+    // Any 401 from any endpoint signals the auth cookie is gone or expired.
+    // Broadcast so the global auth state can clear in real time without waiting
+    // for the next route change.
+    if (res.status === 401 && typeof window !== "undefined") {
+      window.dispatchEvent(new Event(AUTH_UNAUTHORIZED_EVENT));
+    }
     let detail = "";
     try {
       const body = await res.clone().json();

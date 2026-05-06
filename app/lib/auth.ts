@@ -1,7 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ApiError, apiFetch, apiPost, apiPatch } from "@/app/lib/api";
+import {
+  ApiError,
+  AUTH_UNAUTHORIZED_EVENT,
+  apiFetch,
+  apiPost,
+  apiPatch,
+} from "@/app/lib/api";
 
 export interface AuthUser {
   id: number;
@@ -83,6 +89,26 @@ export function useMe() {
 
   useEffect(() => {
     void refetch();
+  }, [refetch]);
+
+  // Clear cached user the moment any API call signals 401, and re-verify with
+  // /auth/me when the tab becomes visible again (covers the JWT expiring while
+  // the tab sat in the background).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    function onUnauthorized() {
+      setUser(null);
+      setLoading(false);
+    }
+    function onVisible() {
+      if (document.visibilityState === "visible") void refetch();
+    }
+    window.addEventListener(AUTH_UNAUTHORIZED_EVENT, onUnauthorized);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.removeEventListener(AUTH_UNAUTHORIZED_EVENT, onUnauthorized);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [refetch]);
 
   return { user, loading, refetch };

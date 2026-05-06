@@ -31,6 +31,13 @@ export default function Header() {
   const { user, refetch } = useMe();
   const isDetail = detailPatterns.some((p) => p.test(pathname));
 
+  // If the server redirected us away (e.g. /mypage → /login because the JWT
+  // expired), the layout-level header doesn't unmount — refetch on every route
+  // change so the avatar dropdown clears once /auth/me is no longer authorized.
+  useEffect(() => {
+    void refetch();
+  }, [pathname, refetch]);
+
   async function onLogout() {
     try {
       await logout();
