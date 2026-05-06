@@ -1,22 +1,8 @@
 "use client";
 
-import "@blocknote/core/fonts/inter.css";
-import "@blocknote/mantine/style.css";
-
-import { useImperativeHandle, type Ref } from "react";
+import dynamic from "next/dynamic";
+import type { Ref } from "react";
 import type { BlockNoteEditor, PartialBlock } from "@blocknote/core";
-import { useCreateBlockNote } from "@blocknote/react";
-import { BlockNoteView } from "@blocknote/mantine";
-
-import { apiPost } from "@/app/lib/api";
-
-interface SignResponse {
-  upload_url: string;
-  public_url: string;
-  key: string;
-  headers: Record<string, string>;
-  stub?: boolean;
-}
 
 export interface RichEditorHandle {
   getJSON: () => PartialBlock[];
@@ -24,66 +10,25 @@ export interface RichEditorHandle {
   editor: BlockNoteEditor;
 }
 
-interface RichEditorProps {
+export interface RichEditorProps {
   initialContent?: PartialBlock[] | null;
   uploadPrefix?: string;
   ref?: Ref<RichEditorHandle>;
 }
 
-function fileToDataURL(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(reader.error ?? new Error("read failed"));
-    reader.readAsDataURL(file);
-  });
-}
-
-async function uploadFile(file: File, prefix: string): Promise<string> {
-  const sign = await apiPost<SignResponse>("/admin/uploads/sign", {
-    filename: file.name,
-    content_type: file.type,
-    prefix,
-  });
-  // Dev / pre-S3 mode: the backend signals stub=true and the upload_url isn't
-  // real. Inline the image as a data URL so it renders in the editor and survives
-  // draft save. Once S3 env vars are configured, stub flips off and the real
-  // PUT path runs.
-  if (sign.stub) {
-    return fileToDataURL(file);
-  }
-  await fetch(sign.upload_url, {
-    method: "PUT",
-    headers: sign.headers,
-    body: file,
-  });
-  return sign.public_url;
-}
-
-export default function RichEditor({
-  initialContent,
-  uploadPrefix = "articles",
-  ref,
-}: RichEditorProps) {
-  const editor = useCreateBlockNote({
-    initialContent:
-      initialContent && initialContent.length > 0 ? initialContent : undefined,
-    uploadFile: (file) => uploadFile(file, uploadPrefix),
-  });
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      getJSON: () => editor.document as PartialBlock[],
-      getHTML: () => editor.blocksToHTMLLossy(editor.document),
-      editor,
-    }),
-    [editor],
-  );
-
-  return (
-    <div className="bg-surface border border-border rounded-xl overflow-hidden min-h-[400px] py-4">
-      <BlockNoteView editor={editor} theme="light" />
+// BlockNote touches `window` during initialisation, so it can't run during SSR.
+// Defer to a client-only dynamic import; show a placeholder while it loads.
+const RichEditorInner = dynamic(() => import("./rich-editor-inner"), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-surface border border-border rounded-xl min-h-[400px] flex items-center justify-center">
+      <span className="font-body text-sm text-text-muted">
+        エディタを読み込み中…
+      </span>
     </div>
-  );
+  ),
+});
+
+export default function RichEditor(props: RichEditorProps) {
+  return <RichEditorInner {...props} />;
 }
