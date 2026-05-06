@@ -350,6 +350,17 @@ export interface HomePairingCard {
   description: string;
 }
 
+export interface FeaturedSake {
+  id: string;
+  name: string;
+  brewery: string;
+  region: string;
+  type: string;
+  description: string;
+  imageUrl: string | null;
+  personalized: boolean;
+}
+
 export interface HomeData {
   seasonal: {
     label: string;
@@ -359,6 +370,7 @@ export interface HomeData {
     items: HomePairingCard[];
   };
   foodCategories: FoodCategoryFilter[];
+  featuredSake: FeaturedSake | null;
 }
 
 /* ── Sake Encyclopedia ────────────────────────── */

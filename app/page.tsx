@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import HeroSection from "@/app/components/sections/hero-section";
 import SeasonalPairingsSection from "@/app/components/sections/seasonal-pairings-section";
 import FindByFoodSection from "@/app/components/sections/find-by-food-section";
@@ -10,19 +11,21 @@ const EMPTY_HOME: HomeData = {
   seasonal: { label: "", items: [] },
   classic: { items: [] },
   foodCategories: [],
+  featuredSake: null,
 };
 
 export default async function Home() {
+  const cookie = (await cookies()).toString();
   let data: HomeData;
   try {
-    data = await apiFetch<HomeData>("/home");
+    data = await apiFetch<HomeData>("/home", { cookie });
   } catch {
     data = EMPTY_HOME;
   }
 
   return (
     <>
-      <HeroSection />
+      <HeroSection featuredSake={data.featuredSake} />
       <SeasonalPairingsSection
         label={data.seasonal.label}
         items={data.seasonal.items}
