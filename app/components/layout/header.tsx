@@ -167,6 +167,16 @@ function UserMenu({
           >
             マイページ
           </Link>
+          {user.is_admin && (
+            <Link
+              role="menuitem"
+              href="/admin"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2.5 font-body text-sm text-text-primary hover:bg-accent-light hover:text-accent transition-colors"
+            >
+              管理画面
+            </Link>
+          )}
           <button
             role="menuitem"
             type="button"
