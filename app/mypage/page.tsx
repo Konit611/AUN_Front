@@ -22,18 +22,13 @@ export default async function MyPage() {
   return (
     <div className="bg-bg min-h-screen">
       {/* Mobile top bar */}
-      <div className="md:hidden flex items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-3">
-          <svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-accent">
-            <path d="M1 1h20M1 8h14M1 15h20" strokeLinecap="round" />
-          </svg>
-          <h1 className="font-display font-bold text-2xl text-accent tracking-tight">
-            私の記録
-          </h1>
-        </div>
-        <button className="text-sm text-accent/70 font-body">
-          Export
-        </button>
+      <div className="md:hidden flex items-center gap-3 px-6 py-4">
+        <svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-accent">
+          <path d="M1 1h20M1 8h14M1 15h20" strokeLinecap="round" />
+        </svg>
+        <h1 className="font-display font-bold text-2xl text-accent tracking-tight">
+          私の記録
+        </h1>
       </div>
 
       {isEmpty ? (
