@@ -13,12 +13,12 @@ export default async function EncyclopediaPage() {
   }
 
   return (
-    <div className="px-6 md:px-8 pt-8 md:pt-16 pb-24 md:pb-20 max-w-[1536px] mx-auto">
-      <div className="flex flex-col gap-2 mb-10 md:mb-16">
+    <div className="px-6 md:px-8 lg:px-12 pt-8 md:pt-16 pb-32 md:pb-24 max-w-[1280px] mx-auto">
+      <div className="flex flex-col gap-2 mb-8 md:mb-12">
         <span className="font-body font-bold text-xs text-accent/60 tracking-[2.4px] uppercase">
           Sake Encyclopedia
         </span>
-        <h1 className="font-display font-bold text-[28px] md:text-[72px] md:leading-[72px] md:tracking-[-3.6px] text-accent">
+        <h1 className="font-display font-bold text-[28px] md:text-[60px] md:leading-none md:tracking-tight text-accent">
           日本酒図鑑
         </h1>
       </div>

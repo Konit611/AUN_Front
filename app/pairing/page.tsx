@@ -170,7 +170,10 @@ export default function PairingGuidePage() {
     <div className="min-h-screen bg-bg">
       {/* ── Mobile ────────────────────────────────────── */}
       <div className="md:hidden px-6 pt-8 pb-32">
-        <div className="flex flex-col gap-1 mb-6">
+        <div className="flex flex-col gap-2 mb-8">
+          <span className="font-body font-bold text-xs text-accent/60 tracking-[2.4px] uppercase">
+            Pairing Guide
+          </span>
           <h1 className="font-display font-bold text-[28px] text-accent">
             {title}
           </h1>
@@ -222,36 +225,16 @@ export default function PairingGuidePage() {
 
       {/* ── Desktop ───────────────────────────────────── */}
       <div className="hidden md:block px-8 lg:px-12 pt-16 pb-24 max-w-[1280px] mx-auto">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-xs font-body tracking-wider uppercase text-text-secondary mb-12">
-          <Link href="/" className="hover:text-accent transition-colors">
-            Home
-          </Link>
-          <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
-            <path d="M1 1L5 5L1 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <Link href="/pairing" className="hover:text-accent transition-colors" onClick={() => { setActiveFood(null); setActiveSeason("all"); }}>
-            Pairing Guide
-          </Link>
-          {activeFood && (
-            <>
-              <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
-                <path d="M1 1L5 5L1 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="font-bold text-accent">
-                {categories.find((c) => c.slug === activeFood)?.label}
-              </span>
-            </>
-          )}
-        </nav>
-
         {/* Header */}
-        <div className="flex flex-col gap-4 mb-12">
+        <div className="flex flex-col gap-2 mb-12">
+          <span className="font-body font-bold text-xs text-accent/60 tracking-[2.4px] uppercase">
+            Pairing Guide
+          </span>
           <h1 className="font-display font-bold text-[60px] leading-none tracking-tight text-accent">
             {title}
           </h1>
           <p className="font-body text-sm text-text-secondary tracking-wider uppercase">
-            {count}件のペアリング found for this category
+            {count}件のペアリング
           </p>
         </div>
 
