@@ -358,6 +358,7 @@ export interface SakeListItem {
 }
 
 export interface SakeDetailPairing {
+  sakanaId: string;
   emoji: string;
   foodName: string;
   description: string;

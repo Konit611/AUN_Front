@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import type { SakeDetailPairing } from "@/app/lib/types";
 
@@ -125,9 +126,10 @@ function PairingGrid({
       {/* Mobile */}
       <div className="md:hidden flex flex-col gap-4">
         {pairings.map((pairing) => (
-          <div
-            key={pairing.foodName}
-            className="bg-surface border border-border rounded-[48px] p-6 flex items-center gap-6"
+          <Link
+            key={pairing.sakanaId || pairing.foodName}
+            href={`/sakana/${pairing.sakanaId}`}
+            className="bg-surface border border-border rounded-[48px] p-6 flex items-center gap-6 hover:border-accent transition-colors"
           >
             <div className="w-16 h-16 bg-surface-raised rounded-full overflow-hidden flex items-center justify-center shrink-0">
               <span className="text-2xl">{pairing.emoji}</span>
@@ -142,26 +144,29 @@ function PairingGrid({
                 </span>
               )}
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
       {/* Desktop */}
       <div className="hidden md:grid grid-cols-3 gap-8">
         {pairings.map((pairing) => (
-          <div
-            key={pairing.foodName}
-            className="bg-surface border border-border/30 rounded-[48px] relative overflow-hidden"
+          <Link
+            key={pairing.sakanaId || pairing.foodName}
+            href={`/sakana/${pairing.sakanaId}`}
+            className="group bg-surface border border-border/30 rounded-[48px] relative overflow-hidden hover:border-accent transition-colors"
           >
             <div className="mx-8 mt-8 rounded-[32px] overflow-hidden">
               <div className="h-48 bg-surface-raised flex items-center justify-center">
-                <span className="text-5xl">{pairing.emoji}</span>
+                <span className="text-5xl group-hover:scale-110 transition-transform">
+                  {pairing.emoji}
+                </span>
               </div>
             </div>
             <div className="px-8 pt-6 pb-8">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">{pairing.emoji}</span>
-                <h3 className="font-display font-bold text-xl text-accent">
+                <h3 className="font-display font-bold text-xl text-accent group-hover:text-accent-hover transition-colors">
                   {pairing.foodName}
                 </h3>
               </div>
@@ -171,7 +176,7 @@ function PairingGrid({
                 </p>
               )}
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </>
