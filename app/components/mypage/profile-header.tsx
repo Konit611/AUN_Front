@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getPersona, isValidCode } from "@/app/lib/persona";
+import { getPersona, getPersonaColors, isValidCode } from "@/app/lib/persona";
 import type { AuthUser } from "@/app/lib/auth";
 
 interface Props {
@@ -17,10 +17,20 @@ export default function ProfileHeader({ user, entryCount }: Props) {
   const showHandle = displayName !== user.username;
 
   return (
-    <section className="flex flex-col md:flex-row gap-6 md:gap-12 items-center md:items-start py-8 md:py-12 border-b border-border">
+    <section className="flex flex-col md:flex-row gap-4 md:gap-12 items-center md:items-start py-8 md:py-12 border-b border-border">
+      {/* Mobile: persona chip floats above the avatar as a "type label". */}
+      <div className="md:hidden">
+        {persona ? <PersonaChip persona={persona} /> : <DiagnosisChip />}
+      </div>
+
       <Avatar avatarUrl={user.avatar_url} initial={initial} alt={displayName} />
 
       <div className="flex flex-col gap-3 flex-1 items-center md:items-start text-center md:text-left">
+        {/* Desktop: same chip sits at the top of the right column. */}
+        <div className="hidden md:block">
+          {persona ? <PersonaChip persona={persona} /> : <DiagnosisChip />}
+        </div>
+
         <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-5">
           <h1 className="font-display font-bold text-2xl md:text-3xl text-accent">
             {displayName}
@@ -39,27 +49,9 @@ export default function ProfileHeader({ user, entryCount }: Props) {
           </span>
         )}
 
-        <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2 font-body text-sm text-text-secondary">
-          <span>
-            <b className="text-accent font-bold">{entryCount}</b>{" "}
-            <span className="text-text-muted">件の記録</span>
-          </span>
-          {persona ? (
-            <Link
-              href={`/result/${persona.code}`}
-              className="hover:text-accent transition-colors"
-            >
-              <b className="text-accent font-bold">{persona.code}</b>
-              <span className="text-text-muted"> ・ {persona.name}</span>
-            </Link>
-          ) : (
-            <Link
-              href="/diagnosis"
-              className="text-accent hover:text-accent-hover transition-colors"
-            >
-              タイプ診断を受ける →
-            </Link>
-          )}
+        <div className="font-body text-sm">
+          <b className="text-accent font-bold">{entryCount}</b>
+          <span className="text-text-muted"> 件の記録</span>
         </div>
 
         {user.bio && (
@@ -69,6 +61,46 @@ export default function ProfileHeader({ user, entryCount }: Props) {
         )}
       </div>
     </section>
+  );
+}
+
+function PersonaChip({
+  persona,
+}: {
+  persona: NonNullable<ReturnType<typeof getPersona>>;
+}) {
+  const colors = getPersonaColors(persona.code);
+  return (
+    <Link
+      href={`/result/${persona.code}`}
+      className="group inline-flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 rounded-full text-white shadow-[0_2px_8px_rgba(43,58,103,0.08)] hover:shadow-[0_4px_12px_rgba(43,58,103,0.16)] transition-shadow"
+      style={{
+        background: `linear-gradient(135deg, ${colors.gradientFrom} 0%, ${colors.gradientTo} 100%)`,
+      }}
+    >
+      <span className="font-display font-bold text-[11px] tracking-widest bg-white/20 px-2 py-0.5 rounded-full">
+        {persona.code}
+      </span>
+      <span className="font-body font-medium text-xs md:text-sm whitespace-nowrap">
+        {persona.name}
+      </span>
+    </Link>
+  );
+}
+
+function DiagnosisChip() {
+  return (
+    <Link
+      href="/diagnosis"
+      className="group inline-flex items-center gap-2 pl-3 pr-4 py-1.5 rounded-full border border-dashed border-border bg-surface/50 text-accent hover:border-accent hover:bg-surface transition-colors"
+    >
+      <span className="text-sm" aria-hidden="true">
+        🍶
+      </span>
+      <span className="font-body font-medium text-xs md:text-sm">
+        タイプ診断を受ける →
+      </span>
+    </Link>
   );
 }
 
@@ -82,7 +114,7 @@ function Avatar({
   alt: string;
 }) {
   return (
-    <div className="w-24 h-24 md:w-36 md:h-36 rounded-full bg-accent flex items-center justify-center shrink-0 overflow-hidden">
+    <div className="w-16 h-16 md:w-24 md:h-24 rounded-full bg-accent flex items-center justify-center shrink-0 overflow-hidden">
       {avatarUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -91,7 +123,7 @@ function Avatar({
           className="w-full h-full object-cover"
         />
       ) : (
-        <span className="font-display font-bold text-3xl md:text-5xl text-white">
+        <span className="font-display font-bold text-2xl md:text-3xl text-white">
           {initial}
         </span>
       )}

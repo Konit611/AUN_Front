@@ -15,29 +15,9 @@ export default function JournalEmptyState() {
           </div>
           {/* Main frame */}
           <div className="relative size-52 bg-surface rounded-tl-[64px] rounded-tr-[48px] rounded-bl-[48px] rounded-br-[48px] shadow-[0_20px_40px_rgba(43,58,103,0.06)] flex items-center justify-center">
-            {/* Sake bottle illustration placeholder */}
-            <svg width="80" height="120" viewBox="0 0 80 120" fill="none" className="text-text-primary/80">
-              <path
-                d="M30 20V10C30 5 35 2 40 2C45 2 50 5 50 10V20"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-              <path
-                d="M28 20C28 20 24 35 24 50V105C24 112 30 118 40 118C50 118 56 112 56 105V50C56 35 52 20 52 20H28Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="currentColor"
-                fillOpacity="0.1"
-              />
-              {/* Choko cup */}
-              <path
-                d="M60 85L56 115H72L68 85H60Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="currentColor"
-                fillOpacity="0.05"
-              />
-            </svg>
+            <span className="text-8xl" aria-hidden="true">
+              🍶
+            </span>
           </div>
         </div>
 

@@ -73,29 +73,38 @@ const navItems = [
     href: "/sakana",
     icon: (
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        {/* Steam */}
         <path
-          d="M3 6C3 4.89543 3.89543 4 5 4H13C14.1046 4 15 4.89543 15 6V13C15 14.1046 14.1046 15 13 15H5C3.89543 15 3 14.1046 3 13V6Z"
+          d="M6 3 Q 6.5 1.5 7 3"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M9 3 Q 9.5 1.5 10 3"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M12 3 Q 12.5 1.5 13 3"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+        />
+        {/* Bowl rim */}
+        <path
+          d="M2 7H16"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        {/* Bowl body */}
+        <path
+          d="M3 7C3 12 6 15 9 15C12 15 15 12 15 7"
           stroke="currentColor"
           strokeWidth="1.5"
           strokeLinejoin="round"
-        />
-        <path
-          d="M3 8H15"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-        <path
-          d="M6 4V2"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-        <path
-          d="M12 4V2"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
         />
       </svg>
     ),
