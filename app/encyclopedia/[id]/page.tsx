@@ -37,7 +37,6 @@ export default async function SakeDetailPage({ params }: SakeDetailPageProps) {
             synergyPairings={sake.synergyPairings}
             cleansePairings={sake.cleansePairings}
             contrastPairings={sake.contrastPairings}
-            sakeName={sake.name}
           />
         </div>
       </div>

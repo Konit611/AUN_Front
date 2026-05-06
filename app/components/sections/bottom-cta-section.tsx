@@ -2,9 +2,9 @@ import LinkButton from "@/app/components/ui/link-button";
 
 export default function BottomCTASection() {
   return (
-    <section className="mx-6 mb-6 md:mx-0 md:mb-0 rounded-3xl md:rounded-none bg-accent-light px-8 py-10 md:px-12 md:py-32">
-      <div className="max-w-[672px] mx-auto flex flex-col items-center text-center gap-6 md:gap-8">
-        <h2 className="font-display font-bold text-xl md:text-[48px] md:leading-[1] text-accent">
+    <section className="mx-6 my-12 md:mx-6 md:my-0 rounded-3xl md:rounded-none bg-accent-light px-8 py-14 md:px-12 md:py-32">
+      <div className="max-w-2xl mx-auto flex flex-col items-center text-center gap-12 md:gap-10">
+        <h2 className="font-display font-bold text-xl md:text-[48px] md:leading-none text-accent">
           あなたにぴったりの
           <br />
           ペアリングを知りたい？

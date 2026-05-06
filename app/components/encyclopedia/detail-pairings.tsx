@@ -28,7 +28,6 @@ interface DetailPairingsProps {
   synergyPairings: SakeDetailPairing[];
   cleansePairings: SakeDetailPairing[];
   contrastPairings: SakeDetailPairing[];
-  sakeName: string;
 }
 
 export default function DetailPairings({
@@ -36,9 +35,7 @@ export default function DetailPairings({
   synergyPairings,
   cleansePairings,
   contrastPairings,
-  sakeName,
 }: DetailPairingsProps) {
-  const shortName = sakeName.split(" ")[0];
   const [tab, setTab] = useState<TabKey>("synergy");
   const algoMap: Record<TabKey, SakeDetailPairing[]> = {
     synergy: synergyPairings,
@@ -51,12 +48,7 @@ export default function DetailPairings({
 
   return (
     <section className="flex flex-col gap-12 md:max-w-[1280px] md:mx-auto md:px-8 md:py-24">
-      {hasManual && (
-        <ManualSection
-          pairings={pairings}
-          shortName={shortName}
-        />
-      )}
+      {hasManual && <ManualSection pairings={pairings} />}
 
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-2 md:gap-3">
@@ -91,23 +83,13 @@ export default function DetailPairings({
           {activeTab.subtitle}
         </p>
 
-        <PairingGrid
-          pairings={activePairings}
-          shortName={shortName}
-          showDescription={false}
-        />
+        <PairingGrid pairings={activePairings} showDescription={false} />
       </div>
     </section>
   );
 }
 
-function ManualSection({
-  pairings,
-  shortName,
-}: {
-  pairings: SakeDetailPairing[];
-  shortName: string;
-}) {
+function ManualSection({ pairings }: { pairings: SakeDetailPairing[] }) {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2 md:gap-3">
@@ -118,22 +100,16 @@ function ManualSection({
           醸造家からの一推し
         </h2>
       </div>
-      <PairingGrid
-        pairings={pairings}
-        shortName={shortName}
-        showDescription
-      />
+      <PairingGrid pairings={pairings} showDescription />
     </div>
   );
 }
 
 function PairingGrid({
   pairings,
-  shortName,
   showDescription,
 }: {
   pairings: SakeDetailPairing[];
-  shortName: string;
   showDescription: boolean;
 }) {
   if (pairings.length === 0) {
@@ -151,26 +127,21 @@ function PairingGrid({
         {pairings.map((pairing) => (
           <div
             key={pairing.foodName}
-            className="bg-surface border border-border rounded-[48px] p-6 flex items-center justify-between"
+            className="bg-surface border border-border rounded-[48px] p-6 flex items-center gap-6"
           >
-            <div className="flex items-center gap-6 min-w-0">
-              <div className="w-16 h-16 bg-surface-raised rounded-full overflow-hidden flex items-center justify-center shrink-0">
-                <span className="text-2xl">{pairing.emoji}</span>
-              </div>
-              <div className="flex flex-col gap-1 min-w-0">
-                <span className="font-body font-bold text-lg leading-7 text-text-primary truncate">
-                  {pairing.emoji} {pairing.foodName}
-                </span>
-                {showDescription && pairing.description && (
-                  <span className="font-body text-xs text-text-secondary line-clamp-1">
-                    {pairing.description}
-                  </span>
-                )}
-              </div>
+            <div className="w-16 h-16 bg-surface-raised rounded-full overflow-hidden flex items-center justify-center shrink-0">
+              <span className="text-2xl">{pairing.emoji}</span>
             </div>
-            <span className="font-display font-bold text-base text-accent shrink-0 ml-2">
-              {shortName}
-            </span>
+            <div className="flex flex-col gap-1 min-w-0">
+              <span className="font-body font-bold text-lg leading-7 text-text-primary truncate">
+                {pairing.foodName}
+              </span>
+              {showDescription && pairing.description && (
+                <span className="font-body text-xs text-text-secondary line-clamp-1">
+                  {pairing.description}
+                </span>
+              )}
+            </div>
           </div>
         ))}
       </div>
