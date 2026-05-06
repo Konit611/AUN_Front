@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { PartialBlock } from "@blocknote/core";
 import { apiFetch, apiPost, apiPut, apiDelete, ApiError } from "@/app/lib/api";
 import type {
   AdminPairingCategory,
@@ -10,6 +11,23 @@ import type {
   AdminSakeListItem,
   AdminSakana,
 } from "@/app/lib/types";
+import RichEditor, { type RichEditorHandle } from "./rich-editor";
+
+// Stitch old (body / why_it_works / how_to_enjoy) into a BlockNote document so
+// pairings authored before the wizard keep their narrative when re-edited.
+function legacyToBlockNote(item: AdminPairingItem): PartialBlock[] | null {
+  const parts: PartialBlock[] = [];
+  if (item.body) parts.push({ type: "paragraph", content: item.body });
+  if (item.whyItWorks) {
+    parts.push({ type: "heading", props: { level: 2 }, content: "なぜ合うのか" });
+    parts.push({ type: "paragraph", content: item.whyItWorks });
+  }
+  if (item.howToEnjoy) {
+    parts.push({ type: "heading", props: { level: 2 }, content: "楽しみ方" });
+    parts.push({ type: "paragraph", content: item.howToEnjoy });
+  }
+  return parts.length > 0 ? parts : null;
+}
 
 interface Props {
   initial?: AdminPairingItem;
@@ -18,25 +36,31 @@ interface Props {
 const inputCls =
   "w-full px-3 py-2 rounded-lg border border-border bg-surface font-body text-sm text-text-primary focus:outline-none focus:border-accent transition-colors";
 
+const STEPS = [
+  { num: 1, label: "参照" },
+  { num: 2, label: "メタ" },
+  { num: 3, label: "本文" },
+] as const;
+
 export default function PairingForm({ initial }: Props) {
   const router = useRouter();
   const isEdit = Boolean(initial);
+  const editorRef = useRef<RichEditorHandle | null>(null);
+
+  const [step, setStep] = useState<1 | 2 | 3>(1);
 
   const [categoryId, setCategoryId] = useState<number | "">(
-    initial?.categoryId ?? ""
+    initial?.categoryId ?? "",
   );
   const [sakeId, setSakeId] = useState(initial?.sakeId ?? "");
   const [sakanaId, setSakanaId] = useState(initial?.sakanaId ?? "");
   const [temperature, setTemperature] = useState(initial?.temperature ?? "");
   const [season, setSeason] = useState(initial?.season ?? "通年");
   const [description, setDescription] = useState(initial?.description ?? "");
-  const [body, setBody] = useState(initial?.body ?? "");
-  const [whyItWorks, setWhyItWorks] = useState(initial?.whyItWorks ?? "");
-  const [howToEnjoy, setHowToEnjoy] = useState(initial?.howToEnjoy ?? "");
   const [heroImage, setHeroImage] = useState(initial?.heroImage ?? "");
   const [personaCode, setPersonaCode] = useState(initial?.personaCode ?? "");
   const [position, setPosition] = useState<string>(
-    initial?.position?.toString() ?? "0"
+    initial?.position?.toString() ?? "0",
   );
 
   const [categories, setCategories] = useState<AdminPairingCategory[]>([]);
@@ -47,7 +71,7 @@ export default function PairingForm({ initial }: Props) {
 
   useEffect(() => {
     apiFetch<AdminPairingCategory[]>("/admin/pairing-categories").then(
-      setCategories
+      setCategories,
     );
     apiFetch<AdminSakeListItem[]>("/admin/sakes").then(setSakes);
     apiFetch<AdminSakana[]>("/admin/sakana").then(setSakanas);
@@ -55,47 +79,62 @@ export default function PairingForm({ initial }: Props) {
 
   const selectedSake = useMemo(
     () => sakes.find((s) => s.id === sakeId),
-    [sakes, sakeId]
+    [sakes, sakeId],
   );
   const selectedSakana = useMemo(
     () => sakanas.find((s) => s.id === sakanaId),
-    [sakanas, sakanaId]
+    [sakanas, sakanaId],
   );
 
-  // Auto-fill temperature from sake when selected (if not already set)
-  useEffect(() => {
-    if (!isEdit && selectedSake && !temperature) {
-      // Sake list endpoint doesn't include serving_temperature; user can fill.
+  const initialBody: PartialBlock[] | null =
+    (initial?.bodyJson as PartialBlock[] | null | undefined) ??
+    (initial ? legacyToBlockNote(initial) : null);
+
+  function step1Valid() {
+    return categoryId !== "" && sakeId && sakanaId;
+  }
+
+  async function buildPayload(asDraft: boolean): Promise<AdminPairingItemInput | null> {
+    if (categoryId === "") {
+      setError("カテゴリは必須です（下書きでもカテゴリは必要）");
+      return null;
     }
-  }, [selectedSake, isEdit, temperature]);
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setSubmitting(true);
-
-    if (categoryId === "" || !sakeId || !sakanaId) {
-      setError("カテゴリ、日本酒、肴を全て選択してください");
-      setSubmitting(false);
-      return;
+    if (!asDraft && !step1Valid()) {
+      setError("公開には日本酒・肴の選択が必須です");
+      return null;
     }
+    const editor = editorRef.current;
+    const bodyJson = editor?.getJSON() ?? null;
+    const bodyHtml = editor ? editor.getHTML() : "";
 
-    const payload: AdminPairingItemInput = {
+    return {
       category_id: Number(categoryId),
       sake_id: sakeId,
       sakana_id: sakanaId,
       temperature: temperature.trim(),
       season: season.trim(),
       description: description.trim(),
-      body: body.trim(),
-      why_it_works: whyItWorks.trim(),
-      how_to_enjoy: howToEnjoy.trim(),
+      body: null,
+      why_it_works: null,
+      how_to_enjoy: null,
+      body_json: bodyJson,
+      body_html: bodyHtml,
+      is_draft: asDraft,
       hero_image: heroImage.trim() || null,
       persona_code: personaCode.trim() || null,
       position: parseInt(position, 10) || 0,
     };
+  }
 
+  async function save(asDraft: boolean) {
+    setError(null);
+    setSubmitting(true);
     try {
+      const payload = await buildPayload(asDraft);
+      if (!payload) {
+        setSubmitting(false);
+        return;
+      }
       if (isEdit && initial) {
         await apiPut<AdminPairingItem>(`/admin/pairings/${initial.id}`, payload);
       } else {
@@ -106,18 +145,27 @@ export default function PairingForm({ initial }: Props) {
     } catch (err) {
       setError(
         err instanceof ApiError
-          ? `保存に失敗しました (${err.status})`
-          : "保存に失敗しました"
+          ? `保存に失敗しました (${err.status}${err.message ? ": " + err.message : ""})`
+          : "保存に失敗しました",
       );
       setSubmitting(false);
     }
+  }
+
+  async function onPublish(e: React.FormEvent) {
+    e.preventDefault();
+    await save(false);
+  }
+
+  async function onSaveDraft() {
+    await save(true);
   }
 
   async function onDelete() {
     if (!initial) return;
     if (
       !confirm(
-        `「${initial.sakanaName} × ${initial.sakeName}」のペアリング記事を削除しますか？`
+        `「${initial.sakanaName} × ${initial.sakeName}」のペアリング記事を削除しますか？`,
       )
     )
       return;
@@ -130,163 +178,159 @@ export default function PairingForm({ initial }: Props) {
       setError(
         err instanceof ApiError
           ? `削除に失敗しました (${err.status})`
-          : "削除に失敗しました"
+          : "削除に失敗しました",
       );
       setSubmitting(false);
     }
   }
 
+  function goNext() {
+    if (step === 1 && !step1Valid()) {
+      setError("カテゴリ・日本酒・肴をすべて選択してください");
+      return;
+    }
+    setError(null);
+    setStep((s) => (s < 3 ? ((s + 1) as 1 | 2 | 3) : s));
+  }
+
+  function goPrev() {
+    setError(null);
+    setStep((s) => (s > 1 ? ((s - 1) as 1 | 2 | 3) : s));
+  }
+
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-8">
-      <Section title="参照する日本酒・肴">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="カテゴリ" required>
-            <select
-              value={categoryId}
-              onChange={(e) =>
-                setCategoryId(e.target.value === "" ? "" : Number(e.target.value))
-              }
-              required
-              className={inputCls}
-            >
-              <option value="">— 選択 —</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.label} ({c.slug})
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="日本酒" required>
-            <select
-              value={sakeId}
-              onChange={(e) => setSakeId(e.target.value)}
-              required
-              className={inputCls}
-            >
-              <option value="">— 選択 —</option>
-              {sakes.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} — {s.brewery}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="肴" required>
-            <select
-              value={sakanaId}
-              onChange={(e) => setSakanaId(e.target.value)}
-              required
-              className={inputCls}
-            >
-              <option value="">— 選択 —</option>
-              {sakanas.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.emoji} {s.name}
-                </option>
-              ))}
-            </select>
-          </Field>
-        </div>
+    <form onSubmit={onPublish} className="flex flex-col gap-8">
+      <Stepper current={step} onJump={(n) => setStep(n)} />
 
-        {(selectedSake || selectedSakana) && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-            {selectedSake && <SakePreview sake={selectedSake} />}
-            {selectedSakana && <SakanaPreview sakana={selectedSakana} />}
+      {step === 1 && (
+        <Section title="参照する日本酒・肴">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="カテゴリ" required>
+              <select
+                value={categoryId}
+                onChange={(e) =>
+                  setCategoryId(
+                    e.target.value === "" ? "" : Number(e.target.value),
+                  )
+                }
+                className={inputCls}
+              >
+                <option value="">— 選択 —</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label} ({c.slug})
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="日本酒" required>
+              <select
+                value={sakeId}
+                onChange={(e) => setSakeId(e.target.value)}
+                className={inputCls}
+              >
+                <option value="">— 選択 —</option>
+                {sakes.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} — {s.brewery}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="肴" required>
+              <select
+                value={sakanaId}
+                onChange={(e) => setSakanaId(e.target.value)}
+                className={inputCls}
+              >
+                <option value="">— 選択 —</option>
+                {sakanas.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.emoji} {s.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
           </div>
-        )}
-      </Section>
 
-      <Section title="このペアリング限定">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="温度 (このペアリング推奨)" required>
-            <input
-              type="text"
-              value={temperature}
-              onChange={(e) => setTemperature(e.target.value)}
-              required
-              placeholder="冷酒 5-10°C"
-              className={inputCls}
-            />
-          </Field>
-          <Field label="季節" required>
-            <input
-              type="text"
-              value={season}
-              onChange={(e) => setSeason(e.target.value)}
-              required
-              placeholder="通年"
-              className={inputCls}
-            />
-          </Field>
-          <Field label="メイン画像URL">
-            <input
-              type="url"
-              value={heroImage}
-              onChange={(e) => setHeroImage(e.target.value)}
-              placeholder="https://..."
-              className={inputCls}
-            />
-          </Field>
-          <Field label="ペルソナコード (任意)">
-            <input
-              type="text"
-              value={personaCode}
-              onChange={(e) => setPersonaCode(e.target.value)}
-              placeholder="SHRB"
-              maxLength={4}
-              className={inputCls}
-            />
-          </Field>
-          <Field label="表示順">
-            <input
-              type="number"
-              value={position}
-              onChange={(e) => setPosition(e.target.value)}
-              className={inputCls}
-            />
-          </Field>
-        </div>
-      </Section>
+          {(selectedSake || selectedSakana) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              {selectedSake && <SakePreview sake={selectedSake} />}
+              {selectedSakana && <SakanaPreview sakana={selectedSakana} />}
+            </div>
+          )}
+        </Section>
+      )}
 
-      <Section title="ナラティブ (ブログ本文)">
-        <Field label="サマリー (リスト用 1〜2 文)" required>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-            rows={2}
-            className={`${inputCls} resize-y`}
+      {step === 2 && (
+        <Section title="このペアリング限定">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="温度">
+              <input
+                type="text"
+                value={temperature}
+                onChange={(e) => setTemperature(e.target.value)}
+                placeholder="冷酒 5-10°C"
+                className={inputCls}
+              />
+            </Field>
+            <Field label="季節">
+              <input
+                type="text"
+                value={season}
+                onChange={(e) => setSeason(e.target.value)}
+                placeholder="通年"
+                className={inputCls}
+              />
+            </Field>
+            <Field label="メイン画像URL">
+              <input
+                type="url"
+                value={heroImage}
+                onChange={(e) => setHeroImage(e.target.value)}
+                placeholder="https://..."
+                className={inputCls}
+              />
+            </Field>
+            <Field label="ペルソナコード (任意)">
+              <input
+                type="text"
+                value={personaCode}
+                onChange={(e) => setPersonaCode(e.target.value)}
+                placeholder="SHRB"
+                maxLength={4}
+                className={inputCls}
+              />
+            </Field>
+            <Field label="表示順">
+              <input
+                type="number"
+                value={position}
+                onChange={(e) => setPosition(e.target.value)}
+                className={inputCls}
+              />
+            </Field>
+          </div>
+          <Field label="サマリー (リスト用 1〜2 文)">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={2}
+              className={`${inputCls} resize-y`}
+            />
+          </Field>
+        </Section>
+      )}
+
+      {step === 3 && (
+        <Section title="本文">
+          <RichEditor
+            ref={editorRef}
+            initialContent={initialBody}
+            uploadPrefix="pairings"
           />
-        </Field>
-        <Field label="導入文" required>
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            required
-            rows={5}
-            className={`${inputCls} resize-y`}
-          />
-        </Field>
-        <Field label="なぜ合うのか" required>
-          <textarea
-            value={whyItWorks}
-            onChange={(e) => setWhyItWorks(e.target.value)}
-            required
-            rows={5}
-            className={`${inputCls} resize-y`}
-          />
-        </Field>
-        <Field label="楽しみ方" required>
-          <textarea
-            value={howToEnjoy}
-            onChange={(e) => setHowToEnjoy(e.target.value)}
-            required
-            rows={5}
-            className={`${inputCls} resize-y`}
-          />
-        </Field>
-      </Section>
+        </Section>
+      )}
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 font-body text-sm">
@@ -307,7 +351,7 @@ export default function PairingForm({ initial }: Props) {
         ) : (
           <span />
         )}
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <button
             type="button"
             onClick={() => router.push("/admin/pairing")}
@@ -316,16 +360,85 @@ export default function PairingForm({ initial }: Props) {
           >
             キャンセル
           </button>
+          {step > 1 && (
+            <button
+              type="button"
+              onClick={goPrev}
+              disabled={submitting}
+              className="px-5 py-2.5 rounded-full border border-border font-body font-medium text-sm text-text-secondary hover:border-accent hover:text-accent disabled:opacity-50 transition-colors"
+            >
+              前へ
+            </button>
+          )}
           <button
-            type="submit"
+            type="button"
+            onClick={onSaveDraft}
             disabled={submitting}
-            className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"
+            className="px-5 py-2.5 rounded-full border border-accent font-body font-medium text-sm text-accent hover:bg-accent/5 disabled:opacity-50 transition-colors"
           >
-            {submitting ? "保存中..." : isEdit ? "更新" : "作成"}
+            下書き保存
           </button>
+          {step < 3 ? (
+            <button
+              type="button"
+              onClick={goNext}
+              disabled={submitting}
+              className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"
+            >
+              次へ
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"
+            >
+              {submitting ? "保存中..." : isEdit ? "公開更新" : "公開"}
+            </button>
+          )}
         </div>
       </div>
     </form>
+  );
+}
+
+function Stepper({
+  current,
+  onJump,
+}: {
+  current: 1 | 2 | 3;
+  onJump: (n: 1 | 2 | 3) => void;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      {STEPS.map((s, i) => {
+        const active = s.num === current;
+        const done = s.num < current;
+        return (
+          <div key={s.num} className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onJump(s.num as 1 | 2 | 3)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full font-body text-xs font-bold tracking-wider transition-colors ${
+                active
+                  ? "bg-accent text-white"
+                  : done
+                    ? "bg-accent/15 text-accent hover:bg-accent/25"
+                    : "bg-surface-raised text-text-muted hover:bg-surface-raised/80"
+              }`}
+            >
+              <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-white/20 text-[10px]">
+                {s.num}
+              </span>
+              {s.label}
+            </button>
+            {i < STEPS.length - 1 && (
+              <span className="w-6 h-px bg-border" aria-hidden />
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 

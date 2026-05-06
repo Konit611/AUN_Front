@@ -150,9 +150,16 @@ export default async function ArticleDetailPage({
 
       {/* Body */}
       <article className="max-w-[720px] mx-auto px-6 md:px-8 py-12 md:py-16 flex flex-col gap-6">
-        {article.body.map((block, i) => (
-          <BlockRenderer key={i} block={block} />
-        ))}
+        {article.bodyHtml ? (
+          <div
+            className="prose-body"
+            dangerouslySetInnerHTML={{ __html: article.bodyHtml }}
+          />
+        ) : (
+          article.body.map((block, i) => (
+            <BlockRenderer key={i} block={block} />
+          ))
+        )}
       </article>
 
       {/* Related articles */}

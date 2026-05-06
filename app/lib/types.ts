@@ -157,9 +157,12 @@ export interface AdminPairingItem {
   temperature: string;
   season: string;
   description: string;
-  body: string;
-  whyItWorks: string;
-  howToEnjoy: string;
+  body: string | null;
+  whyItWorks: string | null;
+  howToEnjoy: string | null;
+  bodyJson: unknown[] | null;
+  bodyHtml: string | null;
+  isDraft: boolean;
   heroImage: string | null;
   personaCode: string | null;
   position: number;
@@ -173,9 +176,12 @@ export interface AdminPairingItemInput {
   temperature: string;
   season: string;
   description: string;
-  body: string;
-  why_it_works: string;
-  how_to_enjoy: string;
+  body?: string | null;
+  why_it_works?: string | null;
+  how_to_enjoy?: string | null;
+  body_json?: unknown[] | null;
+  body_html?: string | null;
+  is_draft: boolean;
   hero_image: string | null;
   persona_code: string | null;
   position: number;
@@ -215,6 +221,9 @@ export interface AdminArticle {
   emoji: string;
   heroImageUrl: string | null;
   body: AdminArticleBlock[];
+  bodyJson: unknown[] | null;
+  bodyHtml: string | null;
+  isDraft: boolean;
   updatedAt: string | null;
 }
 
@@ -229,6 +238,9 @@ export interface AdminArticleInput {
   emoji: string;
   hero_image_url: string | null;
   body: AdminArticleBlock[];
+  body_json?: unknown[] | null;
+  body_html?: string | null;
+  is_draft: boolean;
 }
 
 /* ── Pagination ───────────────────────────────── */
@@ -264,6 +276,7 @@ export interface ArticleListItem {
 
 export interface Article extends ArticleListItem {
   body: ArticleBlock[];
+  bodyHtml: string | null;
 }
 
 export interface CategoryFilter {
@@ -289,9 +302,10 @@ export interface PairingGuideItem {
   temperature: string;
   season: string;
   description: string;
-  body: string;
-  whyItWorks: string;
-  howToEnjoy: string;
+  body: string | null;
+  whyItWorks: string | null;
+  howToEnjoy: string | null;
+  bodyHtml: string | null;
   foodImage: string | null;
   sakeImage: string | null;
   heroImage: string | null;

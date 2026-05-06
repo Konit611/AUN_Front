@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { PartialBlock } from "@blocknote/core";
 import { apiFetch, apiPost, apiPut, apiDelete, ApiError } from "@/app/lib/api";
 import type {
   AdminArticle,
@@ -9,7 +10,42 @@ import type {
   AdminArticleCategory,
   AdminArticleInput,
 } from "@/app/lib/types";
-import ArticleBlockEditor from "./article-block-editor";
+import RichEditor, { type RichEditorHandle } from "./rich-editor";
+
+// Convert legacy paragraph/heading/image/quote blocks into BlockNote PartialBlock[]
+// so editing an article authored before BlockNote doesn't drop its body.
+function legacyToBlockNote(blocks: AdminArticleBlock[]): PartialBlock[] {
+  return blocks.flatMap<PartialBlock>((b) => {
+    if (b.type === "paragraph") {
+      return [{ type: "paragraph", content: b.text }];
+    }
+    if (b.type === "heading") {
+      return [{ type: "heading", props: { level: 2 }, content: b.text }];
+    }
+    if (b.type === "image") {
+      const blocks: PartialBlock[] = [];
+      if (b.image_url) {
+        blocks.push({
+          type: "image",
+          props: { url: b.image_url, caption: b.caption },
+        });
+      } else {
+        blocks.push({
+          type: "paragraph",
+          content: `${b.emoji} ${b.caption}`,
+        });
+      }
+      return blocks;
+    }
+    if (b.type === "quote") {
+      return [
+        { type: "paragraph", content: `「${b.text}」` },
+        { type: "paragraph", content: `— ${b.author}` },
+      ];
+    }
+    return [];
+  });
+}
 
 interface Props {
   initial?: AdminArticle;
@@ -21,21 +57,21 @@ const inputCls =
 export default function ArticleForm({ initial }: Props) {
   const router = useRouter();
   const isEdit = Boolean(initial);
+  const editorRef = useRef<RichEditorHandle | null>(null);
 
   const [slug, setSlug] = useState(initial?.slug ?? "");
   const [title, setTitle] = useState(initial?.title ?? "");
   const [subtitle, setSubtitle] = useState(initial?.subtitle ?? "");
   const [excerpt, setExcerpt] = useState(initial?.excerpt ?? "");
   const [categoryId, setCategoryId] = useState<number | "">(
-    initial?.categoryId ?? ""
+    initial?.categoryId ?? "",
   );
   const [date, setDate] = useState(
-    initial?.date ?? new Date().toISOString().slice(0, 10)
+    initial?.date ?? new Date().toISOString().slice(0, 10),
   );
   const [readTime, setReadTime] = useState(initial?.readTime ?? "5 min");
   const [emoji, setEmoji] = useState(initial?.emoji ?? "");
   const [heroImageUrl, setHeroImageUrl] = useState(initial?.heroImageUrl ?? "");
-  const [body, setBody] = useState<AdminArticleBlock[]>(initial?.body ?? []);
 
   const [categories, setCategories] = useState<AdminArticleCategory[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -43,27 +79,26 @@ export default function ArticleForm({ initial }: Props) {
 
   useEffect(() => {
     apiFetch<AdminArticleCategory[]>("/admin/article-categories").then(
-      setCategories
+      setCategories,
     );
   }, []);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setSubmitting(true);
+  const initialBody: PartialBlock[] | null =
+    (initial?.bodyJson as PartialBlock[] | null | undefined) ??
+    (initial?.body && initial.body.length > 0
+      ? legacyToBlockNote(initial.body)
+      : null);
 
+  async function buildPayload(asDraft: boolean): Promise<AdminArticleInput | null> {
     if (categoryId === "") {
       setError("カテゴリを選択してください");
-      setSubmitting(false);
-      return;
+      return null;
     }
-    if (body.length === 0) {
-      setError("本文に少なくとも1つのブロックを追加してください");
-      setSubmitting(false);
-      return;
-    }
+    const editor = editorRef.current;
+    const bodyJson = editor?.getJSON() ?? null;
+    const bodyHtml = editor ? editor.getHTML() : "";
 
-    const payload: AdminArticleInput = {
+    return {
       slug: slug.trim(),
       title: title.trim(),
       subtitle: subtitle.trim(),
@@ -73,10 +108,22 @@ export default function ArticleForm({ initial }: Props) {
       read_time: readTime.trim(),
       emoji: emoji.trim(),
       hero_image_url: heroImageUrl.trim() || null,
-      body,
+      body: [],
+      body_json: bodyJson,
+      body_html: bodyHtml,
+      is_draft: asDraft,
     };
+  }
 
+  async function save(asDraft: boolean) {
+    setError(null);
+    setSubmitting(true);
     try {
+      const payload = await buildPayload(asDraft);
+      if (!payload) {
+        setSubmitting(false);
+        return;
+      }
       if (isEdit && initial) {
         await apiPut<AdminArticle>(`/admin/articles/${initial.slug}`, payload);
       } else {
@@ -87,11 +134,20 @@ export default function ArticleForm({ initial }: Props) {
     } catch (err) {
       setError(
         err instanceof ApiError
-          ? `保存に失敗しました (${err.status})`
-          : "保存に失敗しました"
+          ? `保存に失敗しました (${err.status}${err.message ? ": " + err.message : ""})`
+          : "保存に失敗しました",
       );
       setSubmitting(false);
     }
+  }
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await save(false);
+  }
+
+  async function onSaveDraft() {
+    await save(true);
   }
 
   async function onDelete() {
@@ -106,7 +162,7 @@ export default function ArticleForm({ initial }: Props) {
       setError(
         err instanceof ApiError
           ? `削除に失敗しました (${err.status})`
-          : "削除に失敗しました"
+          : "削除に失敗しました",
       );
       setSubmitting(false);
     }
@@ -129,12 +185,11 @@ export default function ArticleForm({ initial }: Props) {
               className={`${inputCls} ${isEdit ? "opacity-60" : ""}`}
             />
           </Field>
-          <Field label="絵文字" required>
+          <Field label="絵文字">
             <input
               type="text"
               value={emoji}
               onChange={(e) => setEmoji(e.target.value)}
-              required
               maxLength={10}
               placeholder="🏯"
               className={`${inputCls} text-2xl w-24`}
@@ -150,12 +205,11 @@ export default function ArticleForm({ initial }: Props) {
               className={inputCls}
             />
           </Field>
-          <Field label="サブタイトル" required>
+          <Field label="サブタイトル">
             <input
               type="text"
               value={subtitle}
               onChange={(e) => setSubtitle(e.target.value)}
-              required
               className={inputCls}
             />
           </Field>
@@ -185,12 +239,11 @@ export default function ArticleForm({ initial }: Props) {
               className={inputCls}
             />
           </Field>
-          <Field label="読了時間 (例: 8 min)" required>
+          <Field label="読了時間 (例: 8 min)">
             <input
               type="text"
               value={readTime}
               onChange={(e) => setReadTime(e.target.value)}
-              required
               maxLength={20}
               className={inputCls}
             />
@@ -205,19 +258,22 @@ export default function ArticleForm({ initial }: Props) {
             />
           </Field>
         </div>
-        <Field label="抜粋 (一覧表示用 1〜2 文)" required>
+        <Field label="抜粋 (一覧表示用 1〜2 文)">
           <textarea
             value={excerpt}
             onChange={(e) => setExcerpt(e.target.value)}
-            required
             rows={2}
             className={`${inputCls} resize-y`}
           />
         </Field>
       </Section>
 
-      <Section title="本文 (ブロック)">
-        <ArticleBlockEditor blocks={body} onChange={setBody} />
+      <Section title="本文">
+        <RichEditor
+          ref={editorRef}
+          initialContent={initialBody}
+          uploadPrefix="articles"
+        />
       </Section>
 
       {error && (
@@ -249,11 +305,19 @@ export default function ArticleForm({ initial }: Props) {
             キャンセル
           </button>
           <button
+            type="button"
+            onClick={onSaveDraft}
+            disabled={submitting}
+            className="px-5 py-2.5 rounded-full border border-accent font-body font-medium text-sm text-accent hover:bg-accent/5 disabled:opacity-50 transition-colors"
+          >
+            下書き保存
+          </button>
+          <button
             type="submit"
             disabled={submitting}
             className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"
           >
-            {submitting ? "保存中..." : isEdit ? "更新" : "作成"}
+            {submitting ? "保存中..." : isEdit ? "公開更新" : "公開"}
           </button>
         </div>
       </div>

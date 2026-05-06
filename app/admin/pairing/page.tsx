@@ -72,19 +72,26 @@ export default async function AdminPairingListPage() {
                         href={`/admin/pairing/${item.id}`}
                         className="flex items-center gap-4 px-5 py-3"
                       >
-                        <span className="text-2xl">{item.sakanaEmoji}</span>
+                        <span className="text-2xl">
+                          {item.sakanaEmoji || "📝"}
+                        </span>
                         <div className="flex flex-col min-w-0 flex-1">
                           <span className="font-body font-medium text-text-primary truncate">
-                            {item.sakanaName}
+                            {item.sakanaName || "(肴未選択)"}
                             <span className="text-text-muted">
                               {" × "}
-                              {item.sakeName}
+                              {item.sakeName || "(日本酒未選択)"}
                             </span>
                           </span>
                           <span className="font-body text-xs text-text-muted truncate">
-                            {item.temperature} / {item.season}
+                            {item.temperature || "—"} / {item.season || "—"}
                           </span>
                         </div>
+                        {item.isDraft && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-body font-bold text-[10px] tracking-wider uppercase">
+                            下書き
+                          </span>
+                        )}
                         <span className="font-body text-sm text-accent">
                           編集
                         </span>

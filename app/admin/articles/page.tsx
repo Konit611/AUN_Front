@@ -37,7 +37,7 @@ export default async function AdminArticleListPage() {
                 日付
               </th>
               <th className="text-left px-5 py-3 font-body font-bold text-[10px] tracking-wider uppercase text-accent/60">
-                ブロック
+                状態
               </th>
               <th className="text-left px-5 py-3 font-body font-bold text-[10px] tracking-wider uppercase text-accent/60">
                 {""}
@@ -69,8 +69,16 @@ export default async function AdminArticleListPage() {
                 <td className="px-5 py-4 font-body text-xs text-text-muted tabular-nums">
                   {a.date}
                 </td>
-                <td className="px-5 py-4 font-body text-xs text-text-muted">
-                  {a.body.length} 個
+                <td className="px-5 py-4">
+                  {a.isDraft ? (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-body font-bold text-[10px] tracking-wider uppercase">
+                      下書き
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent/10 text-accent font-body font-bold text-[10px] tracking-wider uppercase">
+                      公開中
+                    </span>
+                  )}
                 </td>
                 <td className="px-5 py-4">
                   <Link

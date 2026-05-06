@@ -87,30 +87,40 @@ export default async function PairingDetailPage({
 
       {/* ── Body ──────────────────────────────────── */}
       <div className="max-w-[720px] mx-auto px-6 md:px-8 py-10 md:py-16 flex flex-col gap-10 md:gap-14">
-        {/* Introduction */}
-        <p className="font-body text-base md:text-lg text-text-primary/85 leading-[1.9]">
-          {pairing.body}
-        </p>
-
-        {/* Why it works */}
-        <section className="flex flex-col gap-3">
-          <h2 className="font-display font-bold text-xl md:text-2xl text-accent">
-            なぜ合うのか
-          </h2>
-          <p className="font-body text-base md:text-lg text-text-primary/85 leading-[1.9]">
-            {pairing.whyItWorks}
-          </p>
-        </section>
-
-        {/* How to enjoy */}
-        <section className="flex flex-col gap-3">
-          <h2 className="font-display font-bold text-xl md:text-2xl text-accent">
-            楽しみ方
-          </h2>
-          <p className="font-body text-base md:text-lg text-text-primary/85 leading-[1.9]">
-            {pairing.howToEnjoy}
-          </p>
-        </section>
+        {pairing.bodyHtml ? (
+          <div
+            className="prose-body"
+            dangerouslySetInnerHTML={{ __html: pairing.bodyHtml }}
+          />
+        ) : (
+          <>
+            {pairing.body && (
+              <p className="font-body text-base md:text-lg text-text-primary/85 leading-[1.9]">
+                {pairing.body}
+              </p>
+            )}
+            {pairing.whyItWorks && (
+              <section className="flex flex-col gap-3">
+                <h2 className="font-display font-bold text-xl md:text-2xl text-accent">
+                  なぜ合うのか
+                </h2>
+                <p className="font-body text-base md:text-lg text-text-primary/85 leading-[1.9]">
+                  {pairing.whyItWorks}
+                </p>
+              </section>
+            )}
+            {pairing.howToEnjoy && (
+              <section className="flex flex-col gap-3">
+                <h2 className="font-display font-bold text-xl md:text-2xl text-accent">
+                  楽しみ方
+                </h2>
+                <p className="font-body text-base md:text-lg text-text-primary/85 leading-[1.9]">
+                  {pairing.howToEnjoy}
+                </p>
+              </section>
+            )}
+          </>
+        )}
 
         {/* Specs card */}
         <div className="bg-surface border border-border rounded-2xl overflow-hidden">

@@ -82,3 +82,64 @@ body {
 .animate-slide-up-delay {
   animation: slide-up 300ms ease-out 500ms both;
 }
+
+/* Rendered BlockNote body content (article + pairing detail pages). */
+.prose-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  color: var(--color-text-primary);
+}
+.prose-body p {
+  font-size: 1rem;
+  line-height: 1.9;
+  color: rgb(26 26 26 / 0.85);
+}
+@media (min-width: 768px) {
+  .prose-body p {
+    font-size: 1.125rem;
+    line-height: 2;
+  }
+}
+.prose-body h1,
+.prose-body h2,
+.prose-body h3 {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin-top: 1rem;
+}
+.prose-body h1 { font-size: 1.75rem; }
+.prose-body h2 { font-size: 1.5rem; }
+.prose-body h3 { font-size: 1.25rem; }
+.prose-body ul,
+.prose-body ol {
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.prose-body ul { list-style: disc; }
+.prose-body ol { list-style: decimal; }
+.prose-body a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose-body blockquote {
+  border-left: 2px solid var(--color-accent);
+  padding-left: 1.25rem;
+  font-style: italic;
+  color: rgb(43 58 103 / 0.8);
+}
+.prose-body img {
+  border-radius: 0.75rem;
+  max-width: 100%;
+  height: auto;
+}
+.prose-body code {
+  background: var(--color-surface-raised);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
