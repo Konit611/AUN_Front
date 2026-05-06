@@ -141,6 +141,9 @@ export interface SakeDetail {
   flavorTags: { label: string; primary: boolean }[];
   servingTags: string[];
   pairings: SakeDetailPairing[];
+  synergyPairings: SakeDetailPairing[];
+  cleansePairings: SakeDetailPairing[];
+  contrastPairings: SakeDetailPairing[];
 }
 
 /* ── Quiz Results ─────────────────────────────── */

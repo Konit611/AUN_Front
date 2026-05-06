@@ -32,7 +32,13 @@ export default async function SakeDetailPage({ params }: SakeDetailPageProps) {
         </div>
 
         <div className="mt-12 md:mt-0">
-          <DetailPairings pairings={sake.pairings} sakeName={sake.name} />
+          <DetailPairings
+            pairings={sake.pairings}
+            synergyPairings={sake.synergyPairings}
+            cleansePairings={sake.cleansePairings}
+            contrastPairings={sake.contrastPairings}
+            sakeName={sake.name}
+          />
         </div>
       </div>
 
