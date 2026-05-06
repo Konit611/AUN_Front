@@ -7,6 +7,7 @@ import HeroSection from "@/app/components/result/hero-section";
 import SakeRecommendationsSection from "@/app/components/result/sake-recommendations-section";
 import PairingsSection from "@/app/components/result/pairings-section";
 import CompatibilitySection from "@/app/components/result/compatibility-section";
+import ResultPersistence from "@/app/components/result/result-persistence";
 
 interface ResultPageProps {
   params: Promise<{ code: string }>;
@@ -72,6 +73,8 @@ export default async function ResultPage({ params }: ResultPageProps) {
         gradientFrom={colors.gradientFrom}
         gradientTo={colors.gradientTo}
       />
+
+      <ResultPersistence code={persona.code} />
 
       <SakeRecommendationsSection
         sakes={data.sakes}
