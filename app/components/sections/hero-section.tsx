@@ -19,11 +19,23 @@ export default function HeroSection() {
             <br className="hidden md:block" />
             日常を彩る、洗練された一献の提案。
           </p>
-          <div className="hidden md:flex gap-4 pt-6">
-            <LinkButton variant="primary" size="lg" href="/pairing">
+          <div className="hidden md:flex flex-wrap gap-4 pt-6">
+            <LinkButton variant="primary" size="lg" href="/diagnosis">
+              タイプ診断をする
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="ml-1">
+                <path
+                  d="M3 8h10M9 4l4 4-4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </LinkButton>
+            <LinkButton variant="secondary" size="lg" href="/pairing">
               ペアリングを探す
             </LinkButton>
-            <LinkButton variant="secondary" size="lg" href="/encyclopedia">
+            <LinkButton variant="ghost" size="lg" href="/encyclopedia">
               蔵元を知る
             </LinkButton>
           </div>

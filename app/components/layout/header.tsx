@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import LinkButton from "@/app/components/ui/link-button";
-import { logout, useMe } from "@/app/lib/auth";
+import { logout, useMe, type AuthUser } from "@/app/lib/auth";
 
 const navLinks = [
   { label: "ホーム", href: "/" },
@@ -66,34 +67,99 @@ export default function Header() {
           ))}
         </ul>
 
-        {/* CTA + auth */}
-        <div className="flex items-center gap-4">
+        {/* Auth */}
+        <div className="flex items-center">
           {user ? (
-            <div className="hidden md:flex items-center gap-3">
-              <span className="font-body text-sm text-text-secondary">
-                {user.username}
-              </span>
-              <button
-                onClick={onLogout}
-                className="font-body text-sm text-text-secondary hover:text-accent transition-colors cursor-pointer"
-              >
-                ログアウト
-              </button>
-            </div>
+            <UserMenu user={user} onLogout={onLogout} />
           ) : (
-            <Link
-              href="/login"
-              className="hidden md:inline font-body text-sm text-text-primary hover:text-accent transition-colors"
-            >
+            <LinkButton variant="primary" size="sm" href="/login">
               ログイン
-            </Link>
+            </LinkButton>
           )}
-          <LinkButton variant="primary" size="sm" href="/diagnosis">
-            タイプ診断
-          </LinkButton>
         </div>
       </nav>
       <div className="h-px bg-border" />
     </header>
+  );
+}
+
+function UserMenu({
+  user,
+  onLogout,
+}: {
+  user: AuthUser;
+  onLogout: () => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const initial = user.username.slice(0, 1).toUpperCase();
+
+  useEffect(() => {
+    if (!open) return;
+    function onDown(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div className="relative" ref={wrapperRef}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label="ユーザーメニューを開く"
+        className="flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-full bg-accent text-white font-display font-bold text-base hover:bg-accent-hover transition-colors cursor-pointer"
+      >
+        {initial}
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute top-full right-0 mt-2 w-56 rounded-2xl border border-border bg-surface shadow-[0_8px_32px_rgba(43,58,103,0.12)] overflow-hidden"
+        >
+          <div className="px-4 py-3 border-b border-border/60">
+            <p className="font-body font-medium text-sm text-text-primary truncate">
+              {user.username}
+            </p>
+            {user.email && (
+              <p className="font-body text-xs text-text-muted truncate mt-0.5">
+                {user.email}
+              </p>
+            )}
+          </div>
+          <Link
+            role="menuitem"
+            href="/mypage"
+            onClick={() => setOpen(false)}
+            className="block px-4 py-2.5 font-body text-sm text-text-primary hover:bg-accent-light hover:text-accent transition-colors"
+          >
+            マイページ
+          </Link>
+          <button
+            role="menuitem"
+            type="button"
+            onClick={async () => {
+              setOpen(false);
+              await onLogout();
+            }}
+            className="block w-full text-left px-4 py-2.5 font-body text-sm text-text-secondary hover:bg-accent-light hover:text-accent transition-colors cursor-pointer"
+          >
+            ログアウト
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
