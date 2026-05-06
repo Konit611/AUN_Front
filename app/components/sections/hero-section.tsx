@@ -35,9 +35,6 @@ export default function HeroSection() {
             <LinkButton variant="secondary" size="lg" href="/pairing">
               ペアリングを探す
             </LinkButton>
-            <LinkButton variant="ghost" size="lg" href="/encyclopedia">
-              蔵元を知る
-            </LinkButton>
           </div>
         </div>
 
