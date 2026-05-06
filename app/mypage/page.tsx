@@ -40,7 +40,7 @@ export default async function MyPage() {
         <JournalEmptyState />
       ) : (
         <div className="px-6 md:px-8 pb-32 md:pb-48 max-w-[1280px] mx-auto">
-          <div className="flex flex-col gap-16 pt-2 md:pt-12">
+          <div className="flex flex-col gap-16 pt-12 md:pt-20">
             <JournalHeader entryCount={entries.length} />
             <JournalGrid entries={entries} />
           </div>

@@ -15,7 +15,7 @@ export default function JournalHeader({ entryCount }: JournalHeaderProps) {
           私の記録
         </h1>
         <p className="text-lg text-text-secondary font-body pt-2 max-w-md">
-          A chronological journey through the refined nuances of artisanal sake.
+          あなたの一献一献が刻む、酒の物語。
         </p>
       </div>
 
