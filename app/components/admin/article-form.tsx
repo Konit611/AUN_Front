@@ -11,6 +11,7 @@ import type {
   AdminArticleInput,
 } from "@/app/lib/types";
 import RichEditor, { type RichEditorHandle } from "./rich-editor";
+import PreviewModal from "./preview-modal";
 
 // Convert legacy paragraph/heading/image/quote blocks into BlockNote PartialBlock[]
 // so editing an article authored before BlockNote doesn't drop its body.
@@ -76,6 +77,8 @@ export default function ArticleForm({ initial }: Props) {
   const [categories, setCategories] = useState<AdminArticleCategory[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState("");
 
   useEffect(() => {
     apiFetch<AdminArticleCategory[]>("/admin/article-categories").then(
@@ -148,6 +151,11 @@ export default function ArticleForm({ initial }: Props) {
 
   async function onSaveDraft() {
     await save(true);
+  }
+
+  function onPreview() {
+    setPreviewHtml(editorRef.current?.getHTML() ?? "");
+    setPreviewOpen(true);
   }
 
   async function onDelete() {
@@ -306,6 +314,14 @@ export default function ArticleForm({ initial }: Props) {
           </button>
           <button
             type="button"
+            onClick={onPreview}
+            disabled={submitting}
+            className="px-5 py-2.5 rounded-full border border-border font-body font-medium text-sm text-text-secondary hover:border-accent hover:text-accent disabled:opacity-50 transition-colors"
+          >
+            プレビュー
+          </button>
+          <button
+            type="button"
             onClick={onSaveDraft}
             disabled={submitting}
             className="px-5 py-2.5 rounded-full border border-accent font-body font-medium text-sm text-accent hover:bg-accent/5 disabled:opacity-50 transition-colors"
@@ -321,6 +337,61 @@ export default function ArticleForm({ initial }: Props) {
           </button>
         </div>
       </div>
+
+      <PreviewModal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        title={`プレビュー: ${title || "(タイトル未入力)"}`}
+      >
+        <div className="flex flex-col gap-6">
+          <div className="flex items-start gap-4">
+            <div className="w-20 h-20 shrink-0 rounded-2xl bg-surface-raised flex items-center justify-center overflow-hidden">
+              {heroImageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={heroImageUrl}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-3xl">{emoji || "📝"}</span>
+              )}
+            </div>
+            <div className="flex flex-col gap-1.5 min-w-0">
+              <span className="font-body text-[10px] tracking-widest uppercase text-accent/60">
+                {categories.find((c) => c.id === categoryId)?.label ??
+                  "(カテゴリ未選択)"}
+              </span>
+              <h1 className="font-display font-bold text-2xl md:text-3xl text-accent leading-tight">
+                {title || "(タイトル未入力)"}
+              </h1>
+              {subtitle && (
+                <p className="font-body text-sm md:text-base text-text-secondary">
+                  {subtitle}
+                </p>
+              )}
+              <span className="font-body text-xs text-text-muted mt-1">
+                {date} {readTime && `· ${readTime}`}
+              </span>
+            </div>
+          </div>
+          {excerpt && (
+            <p className="font-body text-sm text-text-muted italic border-l-2 border-border pl-4">
+              {excerpt}
+            </p>
+          )}
+          {previewHtml ? (
+            <div
+              className="prose-body"
+              dangerouslySetInnerHTML={{ __html: previewHtml }}
+            />
+          ) : (
+            <p className="font-body text-sm text-text-muted">
+              本文がまだ書かれていません。
+            </p>
+          )}
+        </div>
+      </PreviewModal>
     </form>
   );
 }

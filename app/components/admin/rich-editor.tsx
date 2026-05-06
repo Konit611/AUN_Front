@@ -30,19 +30,33 @@ interface RichEditorProps {
   ref?: Ref<RichEditorHandle>;
 }
 
+function fileToDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error ?? new Error("read failed"));
+    reader.readAsDataURL(file);
+  });
+}
+
 async function uploadFile(file: File, prefix: string): Promise<string> {
   const sign = await apiPost<SignResponse>("/admin/uploads/sign", {
     filename: file.name,
     content_type: file.type,
     prefix,
   });
-  if (!sign.stub) {
-    await fetch(sign.upload_url, {
-      method: "PUT",
-      headers: sign.headers,
-      body: file,
-    });
+  // Dev / pre-S3 mode: the backend signals stub=true and the upload_url isn't
+  // real. Inline the image as a data URL so it renders in the editor and survives
+  // draft save. Once S3 env vars are configured, stub flips off and the real
+  // PUT path runs.
+  if (sign.stub) {
+    return fileToDataURL(file);
   }
+  await fetch(sign.upload_url, {
+    method: "PUT",
+    headers: sign.headers,
+    body: file,
+  });
   return sign.public_url;
 }
 

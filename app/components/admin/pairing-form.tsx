@@ -12,6 +12,7 @@ import type {
   AdminSakana,
 } from "@/app/lib/types";
 import RichEditor, { type RichEditorHandle } from "./rich-editor";
+import PreviewModal from "./preview-modal";
 
 // Stitch old (body / why_it_works / how_to_enjoy) into a BlockNote document so
 // pairings authored before the wizard keep their narrative when re-edited.
@@ -68,6 +69,8 @@ export default function PairingForm({ initial }: Props) {
   const [sakanas, setSakanas] = useState<AdminSakana[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState("");
 
   useEffect(() => {
     apiFetch<AdminPairingCategory[]>("/admin/pairing-categories").then(
@@ -159,6 +162,11 @@ export default function PairingForm({ initial }: Props) {
 
   async function onSaveDraft() {
     await save(true);
+  }
+
+  function onPreview() {
+    setPreviewHtml(editorRef.current?.getHTML() ?? "");
+    setPreviewOpen(true);
   }
 
   async function onDelete() {
@@ -372,6 +380,14 @@ export default function PairingForm({ initial }: Props) {
           )}
           <button
             type="button"
+            onClick={onPreview}
+            disabled={submitting}
+            className="px-5 py-2.5 rounded-full border border-border font-body font-medium text-sm text-text-secondary hover:border-accent hover:text-accent disabled:opacity-50 transition-colors"
+          >
+            プレビュー
+          </button>
+          <button
+            type="button"
             onClick={onSaveDraft}
             disabled={submitting}
             className="px-5 py-2.5 rounded-full border border-accent font-body font-medium text-sm text-accent hover:bg-accent/5 disabled:opacity-50 transition-colors"
@@ -398,6 +414,56 @@ export default function PairingForm({ initial }: Props) {
           )}
         </div>
       </div>
+
+      <PreviewModal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        title="ペアリングプレビュー"
+      >
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-wrap gap-2">
+            {season && (
+              <span className="px-3 py-1 text-[10px] font-body font-bold tracking-widest uppercase rounded-full bg-accent/10 text-accent">
+                {season}
+              </span>
+            )}
+            {temperature && (
+              <span className="px-3 py-1 text-[10px] font-body font-bold tracking-widest uppercase rounded-full bg-accent/10 text-accent">
+                {temperature}
+              </span>
+            )}
+          </div>
+          <h1 className="font-display font-bold text-2xl md:text-4xl text-accent leading-tight">
+            {selectedSakana
+              ? `${selectedSakana.emoji} ${selectedSakana.name}`
+              : "(肴未選択)"}
+          </h1>
+          <p className="font-body font-medium text-base md:text-lg text-text-secondary">
+            × {selectedSake?.name ?? "(日本酒未選択)"}
+            {selectedSake && (
+              <span className="text-text-muted font-normal">
+                {" "}
+                / {selectedSake.brewery} · {selectedSake.type}
+              </span>
+            )}
+          </p>
+          {description && (
+            <p className="font-body text-sm text-text-muted italic border-l-2 border-border pl-4">
+              {description}
+            </p>
+          )}
+          {previewHtml ? (
+            <div
+              className="prose-body"
+              dangerouslySetInnerHTML={{ __html: previewHtml }}
+            />
+          ) : (
+            <p className="font-body text-sm text-text-muted">
+              本文がまだ書かれていません。
+            </p>
+          )}
+        </div>
+      </PreviewModal>
     </form>
   );
 }
