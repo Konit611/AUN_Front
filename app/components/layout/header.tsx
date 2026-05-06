@@ -10,7 +10,7 @@ const navLinks = [
   { label: "日本酒図鑑", href: "/encyclopedia" },
   { label: "読みもの", href: "/articles" },
   { label: "ペアリングガイド", href: "/pairing" },
-  { label: "マイページ", href: "/mypage" },
+  { label: "肴帖", href: "/sakana" },
 ];
 
 /** Detail pages: hide the default header on mobile */
@@ -18,6 +18,7 @@ const detailPatterns = [
   /^\/encyclopedia\/.+/,
   /^\/articles\/.+/,
   /^\/pairing\/.+/,
+  /^\/sakana\/.+/,
   /^\/mypage\/.+/,
   /^\/result\/.+/,
   /^\/diagnosis/,

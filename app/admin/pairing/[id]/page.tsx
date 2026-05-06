@@ -31,7 +31,7 @@ export default async function AdminPairingEditPage({ params }: Props) {
       </Link>
       <div>
         <h1 className="font-display font-bold text-2xl md:text-3xl text-accent">
-          {item.recipeEmoji} {item.recipeName} × {item.sakeName}
+          {item.sakanaEmoji} {item.sakanaName} × {item.sakeName}
         </h1>
         <p className="font-body text-xs text-text-muted mt-1">ID: {item.id}</p>
       </div>

@@ -69,13 +69,30 @@ const navItems = [
     ),
   },
   {
-    label: "マイページ",
-    href: "/mypage",
+    label: "肴帖",
+    href: "/sakana",
     icon: (
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <circle cx="9" cy="6" r="4" stroke="currentColor" strokeWidth="1.5" />
         <path
-          d="M2 16C2 13.2386 4.23858 11 7 11H11C13.7614 11 16 13.2386 16 16"
+          d="M3 6C3 4.89543 3.89543 4 5 4H13C14.1046 4 15 4.89543 15 6V13C15 14.1046 14.1046 15 13 15H5C3.89543 15 3 14.1046 3 13V6Z"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M3 8H15"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M6 4V2"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M12 4V2"
           stroke="currentColor"
           strokeWidth="1.5"
           strokeLinecap="round"

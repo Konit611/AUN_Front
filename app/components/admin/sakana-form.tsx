@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiPost, apiPut, apiDelete, ApiError } from "@/app/lib/api";
-import type { AdminRecipe, AdminRecipeInput } from "@/app/lib/types";
+import type { AdminSakana, AdminSakanaInput } from "@/app/lib/types";
 
 interface Props {
-  initial?: AdminRecipe;
+  initial?: AdminSakana;
 }
 
 const AXES = [
@@ -27,7 +27,7 @@ const DIFFICULTY_OPTIONS = [
   { value: "hard", label: "難しい" },
 ];
 
-export default function RecipeForm({ initial }: Props) {
+export default function SakanaForm({ initial }: Props) {
   const router = useRouter();
   const isEdit = Boolean(initial);
 
@@ -83,7 +83,7 @@ export default function RecipeForm({ initial }: Props) {
       .filter((i) => i.name && i.amount);
     const cleanSteps = steps.map((s) => s.trim()).filter(Boolean);
 
-    const body: AdminRecipeInput = {
+    const body: AdminSakanaInput = {
       name: name.trim(),
       emoji: emoji.trim(),
       image_placeholder: imagePlaceholder.trim() || null,
@@ -99,11 +99,11 @@ export default function RecipeForm({ initial }: Props) {
 
     try {
       if (isEdit && initial) {
-        await apiPut<AdminRecipe>(`/admin/recipes/${initial.id}`, body);
+        await apiPut<AdminSakana>(`/admin/sakana/${initial.id}`, body);
       } else {
-        await apiPost<AdminRecipe>("/admin/recipes", body);
+        await apiPost<AdminSakana>("/admin/sakana", body);
       }
-      router.push("/admin/recipe");
+      router.push("/admin/sakana");
       router.refresh();
     } catch (err) {
       setError(
@@ -120,8 +120,8 @@ export default function RecipeForm({ initial }: Props) {
     if (!confirm(`「${initial.name}」を削除しますか？`)) return;
     setSubmitting(true);
     try {
-      await apiDelete(`/admin/recipes/${initial.id}`);
-      router.push("/admin/recipe");
+      await apiDelete(`/admin/sakana/${initial.id}`);
+      router.push("/admin/sakana");
       router.refresh();
     } catch (err) {
       setError(
@@ -345,7 +345,7 @@ export default function RecipeForm({ initial }: Props) {
         <div className="flex gap-3">
           <button
             type="button"
-            onClick={() => router.push("/admin/recipe")}
+            onClick={() => router.push("/admin/sakana")}
             disabled={submitting}
             className="px-5 py-2.5 rounded-full border border-border font-body font-medium text-sm text-text-secondary hover:border-accent hover:text-accent disabled:opacity-50 transition-colors"
           >

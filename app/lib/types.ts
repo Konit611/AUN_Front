@@ -8,14 +8,14 @@ export interface MeUser {
   created_at: string;
 }
 
-/* ── Admin: Recipe ─────────────────────────────── */
+/* ── Admin: Sakana (肴) ─────────────────────────── */
 
 export interface AdminIngredient {
   name: string;
   amount: string;
 }
 
-export interface AdminRecipe {
+export interface AdminSakana {
   id: string;
   name: string;
   emoji: string;
@@ -35,7 +35,7 @@ export interface AdminRecipe {
   difficulty: string | null;
 }
 
-export interface AdminRecipeInput {
+export interface AdminSakanaInput {
   name: string;
   emoji: string;
   image_placeholder: string | null;
@@ -72,8 +72,8 @@ export interface AdminSakeFlavor {
 }
 
 export interface AdminSakePairing {
-  recipeId: string;
-  recipeName: string;
+  sakanaId: string;
+  sakanaName: string;
   emoji: string;
   description: string;
   position: number;
@@ -105,7 +105,7 @@ export interface AdminFlavorMeta {
   label: string;
 }
 
-export interface AdminRecipeMeta {
+export interface AdminSakanaMeta {
   id: string;
   name: string;
   emoji: string;
@@ -129,7 +129,7 @@ export interface AdminSakeInput {
   aroma: number;
   image_url: string | null;
   flavors: { flavor_id: string; is_primary: boolean }[];
-  pairings: { recipe_id: string; description: string; position: number }[];
+  pairings: { sakana_id: string; description: string; position: number }[];
 }
 
 /* ── Admin: Pairing Guide ──────────────────────── */
@@ -150,10 +150,10 @@ export interface AdminPairingItem {
   sakeBrewery: string;
   sakeType: string;
   sakeImageUrl: string | null;
-  recipeId: string;
-  recipeName: string;
-  recipeEmoji: string;
-  recipeImageUrl: string | null;
+  sakanaId: string;
+  sakanaName: string;
+  sakanaEmoji: string;
+  sakanaImageUrl: string | null;
   temperature: string;
   season: string;
   description: string;
@@ -169,7 +169,7 @@ export interface AdminPairingItemInput {
   id?: string | null;
   category_id: number;
   sake_id: string;
-  recipe_id: string;
+  sakana_id: string;
   temperature: string;
   season: string;
   description: string;
@@ -379,6 +379,52 @@ export interface SakeDetail {
   synergyPairings: SakeDetailPairing[];
   cleansePairings: SakeDetailPairing[];
   contrastPairings: SakeDetailPairing[];
+}
+
+/* ── Sakana (肴帖) ─────────────────────────────── */
+
+export interface SakanaTasteAxes {
+  sweetness: number;
+  umami: number;
+  acidity: number;
+  fat: number;
+  aroma: number;
+  saltiness: number;
+}
+
+export interface SakanaListItem {
+  id: string;
+  name: string;
+  emoji: string;
+  imagePlaceholder: string | null;
+  foodImageUrl: string | null;
+  tasteAxes: SakanaTasteAxes;
+  prepTimeMin: number | null;
+  cookTimeMin: number | null;
+  difficulty: string | null;
+}
+
+export interface SakanaIngredient {
+  name: string;
+  amount: string;
+}
+
+export interface SakanaPairedSake {
+  sakeId: string;
+  sakeName: string;
+  brewery: string;
+  region?: string;
+  type: string;
+  imageUrl: string | null;
+  description?: string;
+}
+
+export interface SakanaDetail extends SakanaListItem {
+  ingredients: SakanaIngredient[];
+  steps: string[];
+  servings: number | null;
+  pairings: SakanaPairedSake[];
+  synergyPairings: SakanaPairedSake[];
 }
 
 /* ── Quiz Results ─────────────────────────────── */

@@ -8,7 +8,7 @@ import type {
   AdminPairingItem,
   AdminPairingItemInput,
   AdminSakeListItem,
-  AdminRecipe,
+  AdminSakana,
 } from "@/app/lib/types";
 
 interface Props {
@@ -26,7 +26,7 @@ export default function PairingForm({ initial }: Props) {
     initial?.categoryId ?? ""
   );
   const [sakeId, setSakeId] = useState(initial?.sakeId ?? "");
-  const [recipeId, setRecipeId] = useState(initial?.recipeId ?? "");
+  const [sakanaId, setSakanaId] = useState(initial?.sakanaId ?? "");
   const [temperature, setTemperature] = useState(initial?.temperature ?? "");
   const [season, setSeason] = useState(initial?.season ?? "通年");
   const [description, setDescription] = useState(initial?.description ?? "");
@@ -41,7 +41,7 @@ export default function PairingForm({ initial }: Props) {
 
   const [categories, setCategories] = useState<AdminPairingCategory[]>([]);
   const [sakes, setSakes] = useState<AdminSakeListItem[]>([]);
-  const [recipes, setRecipes] = useState<AdminRecipe[]>([]);
+  const [sakanas, setSakanas] = useState<AdminSakana[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -50,16 +50,16 @@ export default function PairingForm({ initial }: Props) {
       setCategories
     );
     apiFetch<AdminSakeListItem[]>("/admin/sakes").then(setSakes);
-    apiFetch<AdminRecipe[]>("/admin/recipes").then(setRecipes);
+    apiFetch<AdminSakana[]>("/admin/sakana").then(setSakanas);
   }, []);
 
   const selectedSake = useMemo(
     () => sakes.find((s) => s.id === sakeId),
     [sakes, sakeId]
   );
-  const selectedRecipe = useMemo(
-    () => recipes.find((r) => r.id === recipeId),
-    [recipes, recipeId]
+  const selectedSakana = useMemo(
+    () => sakanas.find((s) => s.id === sakanaId),
+    [sakanas, sakanaId]
   );
 
   // Auto-fill temperature from sake when selected (if not already set)
@@ -74,8 +74,8 @@ export default function PairingForm({ initial }: Props) {
     setError(null);
     setSubmitting(true);
 
-    if (categoryId === "" || !sakeId || !recipeId) {
-      setError("カテゴリ、日本酒、料理を全て選択してください");
+    if (categoryId === "" || !sakeId || !sakanaId) {
+      setError("カテゴリ、日本酒、肴を全て選択してください");
       setSubmitting(false);
       return;
     }
@@ -83,7 +83,7 @@ export default function PairingForm({ initial }: Props) {
     const payload: AdminPairingItemInput = {
       category_id: Number(categoryId),
       sake_id: sakeId,
-      recipe_id: recipeId,
+      sakana_id: sakanaId,
       temperature: temperature.trim(),
       season: season.trim(),
       description: description.trim(),
@@ -117,7 +117,7 @@ export default function PairingForm({ initial }: Props) {
     if (!initial) return;
     if (
       !confirm(
-        `「${initial.recipeName} × ${initial.sakeName}」のペアリング記事を削除しますか？`
+        `「${initial.sakanaName} × ${initial.sakeName}」のペアリング記事を削除しますか？`
       )
     )
       return;
@@ -138,7 +138,7 @@ export default function PairingForm({ initial }: Props) {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-8">
-      <Section title="参照する日本酒・料理">
+      <Section title="参照する日本酒・肴">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field label="カテゴリ" required>
             <select
@@ -172,27 +172,27 @@ export default function PairingForm({ initial }: Props) {
               ))}
             </select>
           </Field>
-          <Field label="料理" required>
+          <Field label="肴" required>
             <select
-              value={recipeId}
-              onChange={(e) => setRecipeId(e.target.value)}
+              value={sakanaId}
+              onChange={(e) => setSakanaId(e.target.value)}
               required
               className={inputCls}
             >
               <option value="">— 選択 —</option>
-              {recipes.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.emoji} {r.name}
+              {sakanas.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.emoji} {s.name}
                 </option>
               ))}
             </select>
           </Field>
         </div>
 
-        {(selectedSake || selectedRecipe) && (
+        {(selectedSake || selectedSakana) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
             {selectedSake && <SakePreview sake={selectedSake} />}
-            {selectedRecipe && <RecipePreview recipe={selectedRecipe} />}
+            {selectedSakana && <SakanaPreview sakana={selectedSakana} />}
           </div>
         )}
       </Section>
@@ -350,26 +350,26 @@ function SakePreview({ sake }: { sake: AdminSakeListItem }) {
   );
 }
 
-function RecipePreview({ recipe }: { recipe: AdminRecipe }) {
+function SakanaPreview({ sakana }: { sakana: AdminSakana }) {
   const axes = [
-    ["甘", recipe.sweetness],
-    ["旨", recipe.umami],
-    ["酸", recipe.acidity],
-    ["脂", recipe.fat],
-    ["香", recipe.aroma],
-    ["塩", recipe.saltiness],
+    ["甘", sakana.sweetness],
+    ["旨", sakana.umami],
+    ["酸", sakana.acidity],
+    ["脂", sakana.fat],
+    ["香", sakana.aroma],
+    ["塩", sakana.saltiness],
   ] as const;
   return (
     <div className="bg-surface-raised/40 border border-border rounded-xl p-4 flex gap-3">
       <div className="w-14 h-14 shrink-0 rounded-lg bg-surface flex items-center justify-center text-2xl">
-        {recipe.emoji}
+        {sakana.emoji}
       </div>
       <div className="flex flex-col gap-0.5 min-w-0 flex-1">
         <span className="font-body font-bold text-[10px] tracking-wider uppercase text-accent/60">
-          料理
+          肴
         </span>
         <span className="font-display font-bold text-base text-accent truncate">
-          {recipe.name}
+          {sakana.name}
         </span>
         <div className="flex flex-wrap gap-1.5 mt-1">
           {axes.map(([k, v]) => (

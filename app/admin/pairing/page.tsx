@@ -72,10 +72,10 @@ export default async function AdminPairingListPage() {
                         href={`/admin/pairing/${item.id}`}
                         className="flex items-center gap-4 px-5 py-3"
                       >
-                        <span className="text-2xl">{item.recipeEmoji}</span>
+                        <span className="text-2xl">{item.sakanaEmoji}</span>
                         <div className="flex flex-col min-w-0 flex-1">
                           <span className="font-body font-medium text-text-primary truncate">
-                            {item.recipeName}
+                            {item.sakanaName}
                             <span className="text-text-muted">
                               {" × "}
                               {item.sakeName}

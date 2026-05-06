@@ -7,7 +7,7 @@ import type {
   AdminSake,
   AdminSakeInput,
   AdminFlavorMeta,
-  AdminRecipeMeta,
+  AdminSakanaMeta,
 } from "@/app/lib/types";
 
 interface Props {
@@ -32,7 +32,7 @@ interface FlavorRow {
   is_primary: boolean;
 }
 interface PairingRow {
-  recipe_id: string;
+  sakana_id: string;
   description: string;
 }
 
@@ -70,20 +70,20 @@ export default function SakeForm({ initial }: Props) {
   );
   const [pairingRows, setPairingRows] = useState<PairingRow[]>(
     initial?.pairings.map((p) => ({
-      recipe_id: p.recipeId,
+      sakana_id: p.sakanaId,
       description: p.description,
     })) ?? []
   );
 
   const [flavorMeta, setFlavorMeta] = useState<AdminFlavorMeta[]>([]);
-  const [recipeMeta, setRecipeMeta] = useState<AdminRecipeMeta[]>([]);
+  const [sakanaMeta, setSakanaMeta] = useState<AdminSakanaMeta[]>([]);
 
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     apiFetch<AdminFlavorMeta[]>("/admin/sakes/_meta/flavors").then(setFlavorMeta);
-    apiFetch<AdminRecipeMeta[]>("/admin/sakes/_meta/recipes").then(setRecipeMeta);
+    apiFetch<AdminSakanaMeta[]>("/admin/sakes/_meta/sakana").then(setSakanaMeta);
   }, []);
 
   async function onSubmit(e: React.FormEvent) {
@@ -93,9 +93,9 @@ export default function SakeForm({ initial }: Props) {
 
     const cleanFlavors = flavorRows.filter((f) => f.flavor_id);
     const cleanPairings = pairingRows
-      .filter((p) => p.recipe_id && p.description.trim())
+      .filter((p) => p.sakana_id && p.description.trim())
       .map((p, i) => ({
-        recipe_id: p.recipe_id,
+        sakana_id: p.sakana_id,
         description: p.description.trim(),
         position: i,
       }));
@@ -365,18 +365,18 @@ export default function SakeForm({ initial }: Props) {
                   #{idx + 1}
                 </span>
                 <select
-                  value={row.recipe_id}
+                  value={row.sakana_id}
                   onChange={(e) => {
                     const next = [...pairingRows];
-                    next[idx] = { ...next[idx], recipe_id: e.target.value };
+                    next[idx] = { ...next[idx], sakana_id: e.target.value };
                     setPairingRows(next);
                   }}
                   className={`${inputCls} flex-1`}
                 >
-                  <option value="">— 料理を選択 —</option>
-                  {recipeMeta.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.emoji} {r.name}
+                  <option value="">— 肴を選択 —</option>
+                  {sakanaMeta.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.emoji} {s.name}
                     </option>
                   ))}
                 </select>
@@ -406,7 +406,7 @@ export default function SakeForm({ initial }: Props) {
           <button
             type="button"
             onClick={() =>
-              setPairingRows([...pairingRows, { recipe_id: "", description: "" }])
+              setPairingRows([...pairingRows, { sakana_id: "", description: "" }])
             }
             className="self-start mt-2 px-4 py-2 rounded-full border border-border font-body text-sm text-text-secondary hover:border-accent hover:text-accent transition-colors"
           >

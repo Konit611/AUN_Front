@@ -19,8 +19,8 @@ export default function AdminDashboardPage() {
           description="銘柄の追加・編集、味わいの 5 軸、ペアリング設定"
         />
         <DashCard
-          href="/admin/recipe"
-          title="料理 / レシピ"
+          href="/admin/sakana"
+          title="肴帖"
           description="食材プロファイル 6 軸と調理レシピ（材料・作り方）"
         />
         <DashCard
