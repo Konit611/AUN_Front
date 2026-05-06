@@ -63,6 +63,18 @@ export function apiPut<T>(
   });
 }
 
+export function apiPatch<T>(
+  path: string,
+  body: unknown,
+  options?: ApiOptions,
+): Promise<T> {
+  return send<T>(`${BASE_URL}/api/v1${path}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...withCookie(options) },
+    body: JSON.stringify(body),
+  });
+}
+
 export function apiDelete(path: string, options?: ApiOptions): Promise<void> {
   return send<void>(`${BASE_URL}/api/v1${path}`, {
     method: "DELETE",
