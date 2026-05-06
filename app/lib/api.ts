@@ -29,7 +29,30 @@ async function send<T>(url: string, init: RequestInit): Promise<T> {
     ...init,
   });
   if (!res.ok) {
-    throw new ApiError(res.status, `API request failed with status ${res.status}`);
+    let detail = "";
+    try {
+      const body = await res.clone().json();
+      const raw = (body as { detail?: unknown }).detail;
+      if (typeof raw === "string") {
+        detail = raw;
+      } else if (Array.isArray(raw)) {
+        // FastAPI's RequestValidationError serialises issues as an array of objects.
+        detail = raw
+          .map((e) => {
+            const loc = Array.isArray((e as { loc?: unknown[] }).loc)
+              ? (e as { loc: unknown[] }).loc.slice(1).join(".")
+              : "";
+            const msg = (e as { msg?: string }).msg ?? "";
+            return loc ? `${loc}: ${msg}` : msg;
+          })
+          .filter(Boolean)
+          .join("; ");
+      }
+    } catch {
+      // Body wasn't JSON; ignore.
+    }
+    const fallback = `API request failed with status ${res.status}`;
+    throw new ApiError(res.status, detail || fallback);
   }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
