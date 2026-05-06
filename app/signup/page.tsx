@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
 import { ApiError } from "@/app/lib/api";
 import { signup } from "@/app/lib/auth";
@@ -16,7 +16,6 @@ export default function SignupPage() {
 }
 
 function SignupForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/mypage";
 
@@ -32,8 +31,8 @@ function SignupForm() {
     setSubmitting(true);
     try {
       await signup(email, username, password);
-      router.push(next);
-      router.refresh();
+      // Full reload so the layout's useMe picks up the new auth cookie.
+      window.location.href = next;
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         setError("このメールアドレスまたはユーザー名は既に使用されています");
