@@ -1,13 +1,27 @@
 import { cookies } from "next/headers";
-import { apiFetch } from "@/app/lib/api";
+import { redirect } from "next/navigation";
+import { ApiError, apiFetch } from "@/app/lib/api";
+import type { AuthUser } from "@/app/lib/auth";
 import type { JournalEntry, PaginatedResponse } from "@/app/lib/types";
 import JournalEmptyState from "@/app/components/mypage/journal-empty-state";
 import JournalHeader from "@/app/components/mypage/journal-header";
 import JournalGrid from "@/app/components/mypage/journal-grid";
+import ProfileHeader from "@/app/components/mypage/profile-header";
 import FabButton from "@/app/components/mypage/fab-button";
 
 export default async function MyPage() {
   const cookie = (await cookies()).toString();
+
+  let user: AuthUser;
+  try {
+    user = await apiFetch<AuthUser>("/auth/me", { cookie });
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 401) {
+      redirect("/login?next=/mypage");
+    }
+    throw err;
+  }
+
   let entries: JournalEntry[];
   try {
     const data = await apiFetch<PaginatedResponse<JournalEntry>>("/journal", {
@@ -23,7 +37,15 @@ export default async function MyPage() {
     <div className="bg-bg min-h-screen">
       {/* Mobile top bar */}
       <div className="md:hidden flex items-center gap-3 px-6 py-4">
-        <svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-accent">
+        <svg
+          width="22"
+          height="16"
+          viewBox="0 0 22 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          className="text-accent"
+        >
           <path d="M1 1h20M1 8h14M1 15h20" strokeLinecap="round" />
         </svg>
         <h1 className="font-display font-bold text-2xl text-accent tracking-tight">
@@ -31,16 +53,18 @@ export default async function MyPage() {
         </h1>
       </div>
 
-      {isEmpty ? (
-        <JournalEmptyState />
-      ) : (
-        <div className="px-6 md:px-8 pb-32 md:pb-48 max-w-[1280px] mx-auto">
-          <div className="flex flex-col gap-16 pt-12 md:pt-20">
+      <div className="px-6 md:px-8 pb-32 md:pb-48 max-w-[1280px] mx-auto">
+        <ProfileHeader user={user} entryCount={entries.length} />
+
+        {isEmpty ? (
+          <JournalEmptyState />
+        ) : (
+          <div className="flex flex-col gap-12 pt-8 md:pt-12">
             <JournalHeader entryCount={entries.length} />
             <JournalGrid entries={entries} />
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {!isEmpty && <FabButton />}
     </div>
