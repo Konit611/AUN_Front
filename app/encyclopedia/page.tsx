@@ -36,9 +36,9 @@ export default async function EncyclopediaPage() {
           <Link
             key={sake.id}
             href={`/encyclopedia/${sake.id}`}
-            className="group bg-surface border border-border rounded-[48px] overflow-hidden hover:border-accent transition-colors"
+            className="group bg-surface border border-border rounded-tl-[32px] rounded-br-[32px] md:rounded-tl-[48px] md:rounded-br-[48px] overflow-hidden hover:border-accent transition-colors"
           >
-            <div className="bg-surface-raised m-4 rounded-[32px] overflow-hidden">
+            <div className="bg-surface-raised m-4 rounded-tl-[24px] rounded-br-[24px] md:rounded-tl-[32px] md:rounded-br-[32px] overflow-hidden">
               <div className="h-[240px] md:h-[300px] flex items-center justify-center">
                 <span className="text-5xl group-hover:scale-110 transition-transform">
                   🍶

@@ -9,8 +9,8 @@ export default function DetailHero({ sake }: DetailHeroProps) {
     <section>
       {/* Mobile */}
       <div className="md:hidden flex flex-col gap-8">
-        <div className="bg-surface-raised rounded-[48px] p-4">
-          <div className="rounded-[48px] overflow-hidden">
+        <div className="bg-surface-raised rounded-tl-[48px] rounded-br-[48px] p-4">
+          <div className="rounded-tl-[32px] rounded-br-[32px] overflow-hidden">
             <div className="h-[388px] bg-surface-raised flex items-center justify-center">
               <span className="text-6xl">🍶</span>
             </div>
@@ -71,8 +71,8 @@ export default function DetailHero({ sake }: DetailHeroProps) {
           </div>
         </div>
         <div className="flex flex-col items-center justify-center relative">
-          <div className="absolute -inset-7 -rotate-2 bg-accent/5 rounded-[48px]" />
-          <div className="relative aspect-[4/5] w-full bg-white rounded-tl-[48px] overflow-hidden flex items-center justify-center p-12">
+          <div className="absolute -inset-7 -rotate-2 bg-accent/5 rounded-tl-[48px] rounded-br-[48px]" />
+          <div className="relative aspect-[4/5] w-full bg-white rounded-tl-[48px] rounded-br-[48px] overflow-hidden flex items-center justify-center p-12">
             <span className="text-8xl">🍶</span>
           </div>
         </div>
