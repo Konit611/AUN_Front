@@ -17,6 +17,102 @@ const AXIS_LABEL: Record<keyof SakanaTasteAxes, string> = {
   saltiness: "塩味",
 };
 
+const AXIS_KEYS: Array<keyof SakanaTasteAxes> = [
+  "sweetness",
+  "umami",
+  "acidity",
+  "fat",
+  "aroma",
+  "saltiness",
+];
+
+function TasteRadar({
+  axes,
+  size = 280,
+}: {
+  axes: SakanaTasteAxes;
+  size?: number;
+}) {
+  const cx = size / 2;
+  const cy = size / 2;
+  const R = size * 0.34;
+  const N = AXIS_KEYS.length;
+
+  const vertex = (i: number, v: number) => {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / N;
+    return [cx + R * v * Math.cos(angle), cy + R * v * Math.sin(angle)] as const;
+  };
+  const labelPos = (i: number) => {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / N;
+    const r = R + 26;
+    return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)] as const;
+  };
+  const polygon = (vals: number[]) =>
+    vals.map((v, i) => vertex(i, v).join(",")).join(" ");
+
+  const valuePoints = polygon(AXIS_KEYS.map((k) => axes[k]));
+
+  return (
+    <svg
+      viewBox={`0 0 ${size} ${size}`}
+      className="w-full mx-auto md:mx-0"
+      style={{ maxWidth: size }}
+      role="img"
+      aria-label="味わいプロファイル"
+    >
+      {/* Grid rings (0.33 / 0.66 / 1.0) */}
+      <g stroke="var(--color-border)" fill="none" strokeWidth="1">
+        {[0.33, 0.66, 1].map((v) => (
+          <polygon key={v} points={polygon(Array(N).fill(v))} />
+        ))}
+      </g>
+      {/* Axes spokes */}
+      <g stroke="var(--color-border)" strokeWidth="1">
+        {AXIS_KEYS.map((_, i) => {
+          const [x, y] = vertex(i, 1);
+          return <line key={i} x1={cx} y1={cy} x2={x} y2={y} />;
+        })}
+      </g>
+      {/* Value shape */}
+      <polygon
+        points={valuePoints}
+        fill="var(--color-accent)"
+        fillOpacity="0.18"
+        stroke="var(--color-accent)"
+        strokeWidth="1.5"
+      />
+      {/* Vertex dots */}
+      {AXIS_KEYS.map((k, i) => {
+        const [x, y] = vertex(i, axes[k]);
+        return (
+          <circle key={k} cx={x} cy={y} r="3.5" fill="var(--color-accent)" />
+        );
+      })}
+      {/* Labels */}
+      {AXIS_KEYS.map((k, i) => {
+        const [x, y] = labelPos(i);
+        return (
+          <text
+            key={k}
+            x={x}
+            y={y}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill="var(--color-text-secondary)"
+            style={{
+              fontSize: "12px",
+              fontWeight: 600,
+              letterSpacing: "0.05em",
+            }}
+          >
+            {AXIS_LABEL[k]}
+          </text>
+        );
+      })}
+    </svg>
+  );
+}
+
 const DIFFICULTY_LABEL: Record<string, string> = {
   easy: "易しい",
   medium: "ふつう",
@@ -44,9 +140,10 @@ export default async function SakanaDetailPage({ params }: Props) {
     <div className="flex flex-col">
       <DetailHeader backHref="/sakana" />
       <div className="px-6 md:px-8 lg:px-12 pt-4 md:pt-16 pb-32 md:pb-24 max-w-[1280px] mx-auto w-full">
-        {/* Hero */}
-        <section className="flex flex-col md:flex-row gap-6 md:gap-12 items-start">
-          <div className="w-full md:w-[420px] aspect-[4/3] md:aspect-square bg-surface-raised rounded-tl-[48px] rounded-br-[48px] overflow-hidden flex items-center justify-center shrink-0">
+        {/* Hero — image left, title + radar stacked right (radar bottom-aligns with image) */}
+        <section className="flex flex-col md:flex-row gap-6 md:gap-12 md:items-stretch">
+          {/* Image */}
+          <div className="w-full md:w-[320px] md:h-[320px] aspect-[4/3] md:aspect-auto bg-surface-raised rounded-tl-[48px] rounded-br-[48px] overflow-hidden flex items-center justify-center shrink-0">
             {sakana.foodImageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -55,64 +152,54 @@ export default async function SakanaDetailPage({ params }: Props) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <span className="text-[120px] md:text-[160px]">
+              <span className="text-[120px] md:text-[140px]">
                 {sakana.emoji}
               </span>
             )}
           </div>
-          <div className="flex flex-col gap-3 flex-1">
-            <span className="font-body font-bold text-xs text-accent/60 tracking-[2.4px] uppercase">
-              Sakana / 肴
-            </span>
-            <h1 className="font-display font-bold text-[28px] md:text-[48px] md:leading-tight text-accent">
-              {sakana.name}
-            </h1>
-            <div className="flex flex-wrap gap-2 mt-1">
-              {time && (
-                <span className="px-3 py-1 text-[10px] font-body font-bold tracking-widest uppercase rounded-full bg-accent/10 text-accent">
-                  {time}分
-                </span>
-              )}
-              {difficulty && (
-                <span className="px-3 py-1 text-[10px] font-body font-bold tracking-widest uppercase rounded-full border border-accent/40 text-accent">
-                  {difficulty}
-                </span>
-              )}
-              {sakana.servings && (
-                <span className="px-3 py-1 text-[10px] font-body font-bold tracking-widest uppercase rounded-full border border-border text-text-secondary">
-                  {sakana.servings}人前
-                </span>
-              )}
+
+          {/* Right column: title at top, radar pinned to bottom (image-baseline aligned) */}
+          <div className="flex flex-col gap-6 flex-1 w-full min-w-0">
+            <div className="flex flex-col gap-3">
+              <span className="font-body font-bold text-xs text-accent/60 tracking-[2.4px] uppercase">
+                Sakana / 肴
+              </span>
+              <h1 className="font-display font-bold text-[28px] md:text-[44px] md:leading-tight text-accent">
+                {sakana.name}
+              </h1>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {time && (
+                  <span className="px-3 py-1 text-[10px] font-body font-bold tracking-widest uppercase rounded-full bg-accent/10 text-accent">
+                    {time}分
+                  </span>
+                )}
+                {difficulty && (
+                  <span className="px-3 py-1 text-[10px] font-body font-bold tracking-widest uppercase rounded-full border border-accent/40 text-accent">
+                    {difficulty}
+                  </span>
+                )}
+                {sakana.servings && (
+                  <span className="px-3 py-1 text-[10px] font-body font-bold tracking-widest uppercase rounded-full border border-border text-text-secondary">
+                    {sakana.servings}人前
+                  </span>
+                )}
+              </div>
             </div>
 
-            {/* Taste axes */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3 mt-6">
-              {(Object.keys(AXIS_LABEL) as Array<keyof SakanaTasteAxes>).map(
-                (key) => {
-                  const value = sakana.tasteAxes[key];
-                  return (
-                    <div key={key} className="flex flex-col gap-1">
-                      <div className="flex justify-between font-body text-xs">
-                        <span className="text-text-secondary">
-                          {AXIS_LABEL[key]}
-                        </span>
-                        <span className="text-accent tabular-nums">
-                          {value.toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="h-1 rounded-full bg-surface-raised overflow-hidden">
-                        <div
-                          className="h-full bg-accent rounded-full"
-                          style={{ width: `${value * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                }
-              )}
+            <div className="md:mt-auto flex flex-col gap-2">
+              <TasteRadar axes={sakana.tasteAxes} size={200} />
             </div>
           </div>
         </section>
+
+        {/* Description — bridges hero into the recipe sections */}
+        {sakana.description && (
+          <section className="mt-10 md:mt-14">
+            <p className="font-body text-base md:text-lg text-text-primary/85 leading-[1.9] whitespace-pre-line">
+              {sakana.description}
+            </p>
+          </section>
+        )}
 
         {/* Ingredients */}
         {sakana.ingredients.length > 0 && (

@@ -19,6 +19,7 @@ export interface AdminSakana {
   id: string;
   name: string;
   emoji: string;
+  description: string | null;
   imagePlaceholder: string | null;
   foodImageUrl: string | null;
   sweetness: number;
@@ -38,6 +39,7 @@ export interface AdminSakana {
 export interface AdminSakanaInput {
   name: string;
   emoji: string;
+  description: string | null;
   image_placeholder: string | null;
   food_image_url: string | null;
   sweetness: number;
@@ -96,6 +98,7 @@ export interface AdminSake {
   bitterness: number;
   aroma: number;
   imageUrl: string | null;
+  purchaseUrl: string | null;
   flavors: AdminSakeFlavor[];
   pairings: AdminSakePairing[];
 }
@@ -128,6 +131,7 @@ export interface AdminSakeInput {
   bitterness: number;
   aroma: number;
   image_url: string | null;
+  purchase_url: string | null;
   flavors: { flavor_id: string; is_primary: boolean }[];
   pairings: { sakana_id: string; description: string; position: number }[];
 }
@@ -400,6 +404,8 @@ export interface SakeDetail {
   type: string;
   rice: string;
   polishing: string;
+  imageUrl: string | null;
+  purchaseUrl: string | null;
   flavorTags: { label: string; primary: boolean }[];
   servingTags: string[];
   pairings: SakeDetailPairing[];
@@ -447,6 +453,7 @@ export interface SakanaPairedSake {
 }
 
 export interface SakanaDetail extends SakanaListItem {
+  description: string | null;
   ingredients: SakanaIngredient[];
   steps: string[];
   servings: number | null;

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiPost, apiPut, apiDelete, ApiError } from "@/app/lib/api";
 import type { AdminSakana, AdminSakanaInput } from "@/app/lib/types";
+import Stepper from "./stepper";
+import ImageUploader from "./image-uploader";
 
 interface Props {
   initial?: AdminSakana;
@@ -27,14 +29,23 @@ const DIFFICULTY_OPTIONS = [
   { value: "hard", label: "難しい" },
 ];
 
+const STEPS = [
+  { num: 1, label: "基本情報" },
+  { num: 2, label: "味わい" },
+  { num: 3, label: "作り方" },
+] as const;
+
 export default function SakanaForm({ initial }: Props) {
   const router = useRouter();
   const isEdit = Boolean(initial);
 
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+
   const [name, setName] = useState(initial?.name ?? "");
   const [emoji, setEmoji] = useState(initial?.emoji ?? "");
+  const [description, setDescription] = useState(initial?.description ?? "");
   const [imagePlaceholder, setImagePlaceholder] = useState(
-    initial?.imagePlaceholder ?? ""
+    initial?.imagePlaceholder ?? "",
   );
   const [foodImageUrl, setFoodImageUrl] = useState(initial?.foodImageUrl ?? "");
   const [axes, setAxes] = useState<Record<AxisKey, number>>(() => ({
@@ -48,19 +59,19 @@ export default function SakanaForm({ initial }: Props) {
   const [ingredients, setIngredients] = useState(
     initial?.ingredients?.length
       ? initial.ingredients
-      : [{ name: "", amount: "" }]
+      : [{ name: "", amount: "" }],
   );
   const [steps, setSteps] = useState<string[]>(
-    initial?.steps?.length ? initial.steps : [""]
+    initial?.steps?.length ? initial.steps : [""],
   );
   const [prepTimeMin, setPrepTimeMin] = useState<string>(
-    initial?.prepTimeMin?.toString() ?? ""
+    initial?.prepTimeMin?.toString() ?? "",
   );
   const [cookTimeMin, setCookTimeMin] = useState<string>(
-    initial?.cookTimeMin?.toString() ?? ""
+    initial?.cookTimeMin?.toString() ?? "",
   );
   const [servings, setServings] = useState<string>(
-    initial?.servings?.toString() ?? ""
+    initial?.servings?.toString() ?? "",
   );
   const [difficulty, setDifficulty] = useState(initial?.difficulty ?? "");
 
@@ -73,9 +84,20 @@ export default function SakanaForm({ initial }: Props) {
     return Number.isFinite(n) ? n : null;
   }
 
+  function step1Valid() {
+    return Boolean(name.trim());
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (!step1Valid()) {
+      setStep(1);
+      setError("料理名は必須です");
+      return;
+    }
+
     setSubmitting(true);
 
     const cleanIngredients = ingredients
@@ -86,6 +108,7 @@ export default function SakanaForm({ initial }: Props) {
     const body: AdminSakanaInput = {
       name: name.trim(),
       emoji: emoji.trim(),
+      description: description.trim() || null,
       image_placeholder: imagePlaceholder.trim() || null,
       food_image_url: foodImageUrl.trim() || null,
       ...axes,
@@ -108,8 +131,8 @@ export default function SakanaForm({ initial }: Props) {
     } catch (err) {
       setError(
         err instanceof ApiError
-          ? `保存に失敗しました (${err.status})`
-          : "保存に失敗しました"
+          ? `保存に失敗しました (${err.status}${err.message ? ": " + err.message : ""})`
+          : "保存に失敗しました",
       );
       setSubmitting(false);
     }
@@ -127,201 +150,241 @@ export default function SakanaForm({ initial }: Props) {
       setError(
         err instanceof ApiError
           ? `削除に失敗しました (${err.status}): ${err.message}`
-          : "削除に失敗しました"
+          : "削除に失敗しました",
       );
       setSubmitting(false);
     }
   }
 
+  function goNext() {
+    if (step === 1 && !step1Valid()) {
+      setError("料理名を入力してください");
+      return;
+    }
+    setError(null);
+    setStep((s) => (s < 3 ? ((s + 1) as 1 | 2 | 3) : s));
+  }
+
+  function goPrev() {
+    setError(null);
+    setStep((s) => (s > 1 ? ((s - 1) as 1 | 2 | 3) : s));
+  }
+
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-8">
-      <Section title="基本情報">
-        <Field label="料理名" required>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            maxLength={100}
-            className={inputCls}
-          />
-        </Field>
-        <Field label="絵文字" required>
-          <input
-            type="text"
-            value={emoji}
-            onChange={(e) => setEmoji(e.target.value)}
-            required
-            maxLength={10}
-            placeholder="🍢"
-            className={`${inputCls} text-2xl w-24`}
-          />
-        </Field>
-        <Field label="画像URL">
-          <input
-            type="url"
-            value={foodImageUrl}
-            onChange={(e) => setFoodImageUrl(e.target.value)}
-            placeholder="https://..."
-            className={inputCls}
-          />
-        </Field>
-        <Field label="画像プレースホルダー (内部キー)">
-          <input
-            type="text"
-            value={imagePlaceholder}
-            onChange={(e) => setImagePlaceholder(e.target.value)}
-            placeholder="yakitori"
-            className={inputCls}
-          />
-        </Field>
-      </Section>
+      <Stepper
+        steps={STEPS}
+        current={step}
+        onJump={(n) => setStep(n as 1 | 2 | 3)}
+      />
 
-      <Section title="味わいプロファイル (0.0–1.0)">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-          {AXES.map(({ key, label }) => (
-            <AxisSlider
-              key={key}
-              label={label}
-              value={axes[key]}
-              onChange={(v) => setAxes((s) => ({ ...s, [key]: v }))}
+      {step === 1 && (
+        <Section title="基本情報">
+          <Field label="料理名" required>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              maxLength={100}
+              className={inputCls}
             />
-          ))}
-        </div>
-      </Section>
+          </Field>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="絵文字 (画像がない時のフォールバック)">
+              <input
+                type="text"
+                value={emoji}
+                onChange={(e) => setEmoji(e.target.value)}
+                maxLength={10}
+                placeholder="🍢"
+                className={`${inputCls} text-2xl`}
+              />
+            </Field>
+            <Field label="画像プレースホルダー (内部キー)">
+              <input
+                type="text"
+                value={imagePlaceholder}
+                onChange={(e) => setImagePlaceholder(e.target.value)}
+                placeholder="yakitori"
+                className={inputCls}
+              />
+            </Field>
+          </div>
+          <Field label="写真">
+            <ImageUploader
+              value={foodImageUrl || null}
+              onChange={(url) => setFoodImageUrl(url ?? "")}
+              prefix="sakana"
+              aspect="photo"
+            />
+          </Field>
+          <Field label="説明 (料理紹介 + 日本酒との相性)">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={10}
+              placeholder="例: 薄切りの白身魚を柑橘とオリーブオイルで仕上げる、爽やかな前菜。&#10;&#10;淡麗辛口の純米酒や、香りの華やかな吟醸酒と好相性..."
+              className={`${inputCls} resize-y min-h-[240px] leading-relaxed`}
+            />
+          </Field>
+        </Section>
+      )}
 
-      <Section title="材料">
-        <div className="flex flex-col gap-2">
-          {ingredients.map((ing, idx) => (
-            <div key={idx} className="flex gap-2 items-center">
-              <input
-                type="text"
-                value={ing.name}
-                onChange={(e) => {
-                  const next = [...ingredients];
-                  next[idx] = { ...next[idx], name: e.target.value };
-                  setIngredients(next);
-                }}
-                placeholder="鶏もも肉"
-                className={`${inputCls} flex-1`}
+      {step === 2 && (
+        <Section title="味わいプロファイル (0.0–1.0)">
+          <p className="font-body text-xs text-text-muted -mt-2">
+            6 軸でこの肴の味わいを表します。日本酒のマッチングに使われます。
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+            {AXES.map(({ key, label }) => (
+              <AxisSlider
+                key={key}
+                label={label}
+                value={axes[key]}
+                onChange={(v) => setAxes((s) => ({ ...s, [key]: v }))}
               />
-              <input
-                type="text"
-                value={ing.amount}
-                onChange={(e) => {
-                  const next = [...ingredients];
-                  next[idx] = { ...next[idx], amount: e.target.value };
-                  setIngredients(next);
-                }}
-                placeholder="200g"
-                className={`${inputCls} w-32`}
-              />
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {step === 3 && (
+        <>
+          <Section title="材料">
+            <div className="flex flex-col gap-2">
+              {ingredients.map((ing, idx) => (
+                <div key={idx} className="flex gap-2 items-center">
+                  <input
+                    type="text"
+                    value={ing.name}
+                    onChange={(e) => {
+                      const next = [...ingredients];
+                      next[idx] = { ...next[idx], name: e.target.value };
+                      setIngredients(next);
+                    }}
+                    placeholder="鶏もも肉"
+                    className={`${inputCls} flex-1`}
+                  />
+                  <input
+                    type="text"
+                    value={ing.amount}
+                    onChange={(e) => {
+                      const next = [...ingredients];
+                      next[idx] = { ...next[idx], amount: e.target.value };
+                      setIngredients(next);
+                    }}
+                    placeholder="200g"
+                    className={`${inputCls} w-32`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setIngredients(ingredients.filter((_, i) => i !== idx))
+                    }
+                    className="px-2 py-2 text-text-muted hover:text-red-600 transition-colors"
+                    aria-label="削除"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
               <button
                 type="button"
                 onClick={() =>
-                  setIngredients(ingredients.filter((_, i) => i !== idx))
+                  setIngredients([...ingredients, { name: "", amount: "" }])
                 }
-                className="px-2 py-2 text-text-muted hover:text-red-600 transition-colors"
-                aria-label="削除"
+                className="self-start mt-2 px-4 py-2 rounded-full border border-border font-body text-sm text-text-secondary hover:border-accent hover:text-accent transition-colors"
               >
-                ×
+                + 材料を追加
               </button>
             </div>
-          ))}
-          <button
-            type="button"
-            onClick={() =>
-              setIngredients([...ingredients, { name: "", amount: "" }])
-            }
-            className="self-start mt-2 px-4 py-2 rounded-full border border-border font-body text-sm text-text-secondary hover:border-accent hover:text-accent transition-colors"
-          >
-            + 材料を追加
-          </button>
-        </div>
-      </Section>
+          </Section>
 
-      <Section title="作り方">
-        <div className="flex flex-col gap-2">
-          {steps.map((step, idx) => (
-            <div key={idx} className="flex gap-2 items-start">
-              <span className="font-body font-bold text-sm text-accent w-6 mt-3">
-                {idx + 1}
-              </span>
-              <textarea
-                value={step}
-                onChange={(e) => {
-                  const next = [...steps];
-                  next[idx] = e.target.value;
-                  setSteps(next);
-                }}
-                rows={2}
-                placeholder="鶏肉を一口大に切る..."
-                className={`${inputCls} flex-1 resize-y`}
-              />
+          <Section title="作り方">
+            <div className="flex flex-col gap-2">
+              {steps.map((stepText, idx) => (
+                <div key={idx} className="flex gap-2 items-start">
+                  <span className="font-body font-bold text-sm text-accent w-6 mt-3">
+                    {idx + 1}
+                  </span>
+                  <textarea
+                    value={stepText}
+                    onChange={(e) => {
+                      const next = [...steps];
+                      next[idx] = e.target.value;
+                      setSteps(next);
+                    }}
+                    rows={2}
+                    placeholder="鶏肉を一口大に切る..."
+                    className={`${inputCls} flex-1 resize-y`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setSteps(steps.filter((_, i) => i !== idx))}
+                    className="px-2 py-2 mt-1 text-text-muted hover:text-red-600 transition-colors"
+                    aria-label="削除"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
               <button
                 type="button"
-                onClick={() => setSteps(steps.filter((_, i) => i !== idx))}
-                className="px-2 py-2 mt-1 text-text-muted hover:text-red-600 transition-colors"
-                aria-label="削除"
+                onClick={() => setSteps([...steps, ""])}
+                className="self-start mt-2 px-4 py-2 rounded-full border border-border font-body text-sm text-text-secondary hover:border-accent hover:text-accent transition-colors"
               >
-                ×
+                + 手順を追加
               </button>
             </div>
-          ))}
-          <button
-            type="button"
-            onClick={() => setSteps([...steps, ""])}
-            className="self-start mt-2 px-4 py-2 rounded-full border border-border font-body text-sm text-text-secondary hover:border-accent hover:text-accent transition-colors"
-          >
-            + 手順を追加
-          </button>
-        </div>
-      </Section>
+          </Section>
 
-      <Section title="メタ情報">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Field label="準備 (分)">
-            <input
-              type="number"
-              min={0}
-              value={prepTimeMin}
-              onChange={(e) => setPrepTimeMin(e.target.value)}
-              className={inputCls}
-            />
-          </Field>
-          <Field label="調理 (分)">
-            <input
-              type="number"
-              min={0}
-              value={cookTimeMin}
-              onChange={(e) => setCookTimeMin(e.target.value)}
-              className={inputCls}
-            />
-          </Field>
-          <Field label="人数">
-            <input
-              type="number"
-              min={1}
-              value={servings}
-              onChange={(e) => setServings(e.target.value)}
-              className={inputCls}
-            />
-          </Field>
-          <Field label="難易度">
-            <select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-              className={inputCls}
-            >
-              {DIFFICULTY_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </Field>
-        </div>
-      </Section>
+          <Section title="メタ情報">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Field label="準備 (分)">
+                <input
+                  type="number"
+                  min={0}
+                  value={prepTimeMin}
+                  onChange={(e) => setPrepTimeMin(e.target.value)}
+                  className={inputCls}
+                />
+              </Field>
+              <Field label="調理 (分)">
+                <input
+                  type="number"
+                  min={0}
+                  value={cookTimeMin}
+                  onChange={(e) => setCookTimeMin(e.target.value)}
+                  className={inputCls}
+                />
+              </Field>
+              <Field label="人数">
+                <input
+                  type="number"
+                  min={1}
+                  value={servings}
+                  onChange={(e) => setServings(e.target.value)}
+                  className={inputCls}
+                />
+              </Field>
+              <Field label="難易度">
+                <select
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                  className={inputCls}
+                >
+                  {DIFFICULTY_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
+          </Section>
+        </>
+      )}
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 font-body text-sm">
@@ -342,7 +405,7 @@ export default function SakanaForm({ initial }: Props) {
         ) : (
           <span />
         )}
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <button
             type="button"
             onClick={() => router.push("/admin/sakana")}
@@ -351,13 +414,34 @@ export default function SakanaForm({ initial }: Props) {
           >
             キャンセル
           </button>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"
-          >
-            {submitting ? "保存中..." : isEdit ? "更新" : "作成"}
-          </button>
+          {step > 1 && (
+            <button
+              type="button"
+              onClick={goPrev}
+              disabled={submitting}
+              className="px-5 py-2.5 rounded-full border border-border font-body font-medium text-sm text-text-secondary hover:border-accent hover:text-accent disabled:opacity-50 transition-colors"
+            >
+              前へ
+            </button>
+          )}
+          {step < 3 ? (
+            <button
+              type="button"
+              onClick={goNext}
+              disabled={submitting}
+              className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"
+            >
+              次へ
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"
+            >
+              {submitting ? "保存中..." : isEdit ? "更新" : "作成"}
+            </button>
+          )}
         </div>
       </div>
     </form>
