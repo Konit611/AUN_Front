@@ -44,7 +44,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center px-6 py-16">
+    <div className="min-h-[calc(100vh-64px)] md:min-h-[calc(100vh-92px)] bg-bg flex items-start justify-center px-6 pt-16 md:pt-32 pb-12">
       <div className="w-full max-w-[400px] flex flex-col gap-8">
         <div className="flex flex-col items-center gap-2">
           <span className="font-body text-xs text-accent/60 tracking-[2.4px] uppercase">
