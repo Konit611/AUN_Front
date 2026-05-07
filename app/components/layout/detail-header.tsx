@@ -11,7 +11,13 @@ export default function DetailHeader({ title, backHref }: DetailHeaderProps) {
   const router = useRouter();
 
   const handleBack = () => {
-    if (backHref) {
+    // Prefer real history when the user navigated here from another page in
+    // the app (e.g., sake detail → paired sakana). Fall back to the hardcoded
+    // listing route only for direct-link / new-tab arrivals where there's
+    // nothing to go back to.
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else if (backHref) {
       router.push(backHref);
     } else {
       router.back();
