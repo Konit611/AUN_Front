@@ -54,6 +54,7 @@ export default async function AdminLayout({
                 href="/admin/articles/categories"
                 label="└ カテゴリ"
               />
+              <NavItem href="/admin/data" label="データ管理" />
             </nav>
 
             <Link
