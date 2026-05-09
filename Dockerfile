@@ -6,6 +6,10 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 RUN npx next build --webpack
 
 EXPOSE 3000
