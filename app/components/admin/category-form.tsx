@@ -93,7 +93,7 @@ export default function CategoryForm({ initial }: Props) {
           onChange={(e) => setSlug(e.target.value)}
           required
           maxLength={40}
-          pattern="^[a-z0-9-]+$"
+          pattern="^[a-z0-9\-]+$"
           placeholder="grilled"
           disabled={isEdit}
           className={`${inputCls} ${isEdit ? "opacity-60" : ""}`}

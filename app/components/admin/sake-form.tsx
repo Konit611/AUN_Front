@@ -247,7 +247,7 @@ export default function SakeForm({ initial }: Props) {
                 required
                 disabled={isEdit}
                 maxLength={50}
-                pattern="^[a-z0-9-]+$"
+                pattern="^[a-z0-9\-]+$"
                 placeholder="dassai-45"
                 className={`${inputCls} ${isEdit ? "opacity-60" : ""}`}
               />

@@ -213,7 +213,7 @@ export default function ArticleForm({ initial }: Props) {
                 onChange={(e) => setSlug(e.target.value)}
                 required
                 maxLength={80}
-                pattern="^[a-z0-9-]+$"
+                pattern="^[a-z0-9\-]+$"
                 placeholder="kubota-brewery-story"
                 disabled={isEdit}
                 className={`${inputCls} ${isEdit ? "opacity-60" : ""}`}
