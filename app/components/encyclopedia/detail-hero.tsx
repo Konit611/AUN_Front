@@ -84,7 +84,7 @@ export default function DetailHero({ sake }: DetailHeroProps) {
               <img
                 src={sake.imageUrl}
                 alt={sake.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain p-6"
               />
             ) : (
               <span className="text-8xl">🍶</span>
