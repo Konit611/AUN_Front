@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiPost, apiPut, apiDelete, ApiError } from "@/app/lib/api";
+import { apiFetch, apiPost, apiPut, apiDelete, ApiError } from "@/app/lib/api";
 import { uploadAdminImage } from "@/app/lib/admin-upload";
-import type { AdminSakana, AdminSakanaInput } from "@/app/lib/types";
+import type {
+  AdminSakana,
+  AdminSakanaCategory,
+  AdminSakanaInput,
+} from "@/app/lib/types";
 import Stepper from "./stepper";
 import ImageUploader from "./image-uploader";
 
@@ -43,6 +47,10 @@ export default function SakanaForm({ initial }: Props) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
   const [name, setName] = useState(initial?.name ?? "");
+  const [categoryId, setCategoryId] = useState<string>(
+    initial?.categoryId?.toString() ?? "",
+  );
+  const [categories, setCategories] = useState<AdminSakanaCategory[]>([]);
   const [emoji, setEmoji] = useState(initial?.emoji ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [imagePlaceholder, setImagePlaceholder] = useState(
@@ -80,6 +88,12 @@ export default function SakanaForm({ initial }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  useEffect(() => {
+    apiFetch<AdminSakanaCategory[]>("/admin/sakana-categories").then(
+      setCategories,
+    );
+  }, []);
+
   function intOrNull(s: string): number | null {
     if (!s.trim()) return null;
     const n = parseInt(s, 10);
@@ -87,7 +101,7 @@ export default function SakanaForm({ initial }: Props) {
   }
 
   function step1Valid() {
-    return Boolean(name.trim());
+    return Boolean(name.trim() && categoryId);
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -96,7 +110,7 @@ export default function SakanaForm({ initial }: Props) {
 
     if (!step1Valid()) {
       setStep(1);
-      setError("料理名は必須です");
+      setError("料理名とカテゴリは必須です");
       return;
     }
 
@@ -124,6 +138,7 @@ export default function SakanaForm({ initial }: Props) {
 
     const body: AdminSakanaInput = {
       name: name.trim(),
+      category_id: parseInt(categoryId, 10),
       emoji: emoji.trim(),
       description: description.trim() || null,
       image_placeholder: imagePlaceholder.trim() || null,
@@ -206,6 +221,21 @@ export default function SakanaForm({ initial }: Props) {
               maxLength={100}
               className={inputCls}
             />
+          </Field>
+          <Field label="カテゴリ" required>
+            <select
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              required
+              className={inputCls}
+            >
+              <option value="">— 選択 —</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
           </Field>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="絵文字 (画像がない時のフォールバック)">

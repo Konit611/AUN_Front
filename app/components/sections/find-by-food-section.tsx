@@ -20,14 +20,14 @@ export default function FindByFoodSection({
           {categories.map((cat) => (
             <Link
               key={cat.key}
-              href={`/pairing?food=${cat.key}`}
+              href={`/sakana?category=${cat.key}`}
               className="inline-flex items-center justify-center px-6 py-2 md:px-12 md:py-5 rounded-full bg-accent-light text-accent font-bold text-sm md:text-lg hover:bg-accent/10 transition-colors"
             >
               {cat.label}
             </Link>
           ))}
           <Link
-            href="/pairing"
+            href="/sakana"
             aria-label="もっと見る"
             className="inline-flex items-center justify-center w-[59px] h-9 md:w-auto md:h-auto md:px-12 md:py-5 rounded-full bg-accent-light text-accent hover:bg-accent/10 transition-colors"
           >

@@ -44,6 +44,10 @@ export default async function AdminLayout({
               <NavItem href="/admin" label="ダッシュボード" />
               <NavItem href="/admin/sake" label="日本酒" />
               <NavItem href="/admin/sakana" label="肴帖" />
+              <NavItem
+                href="/admin/sakana/categories"
+                label="└ カテゴリ"
+              />
               <NavItem href="/admin/pairing" label="ペアリングガイド" />
               <NavItem
                 href="/admin/pairing/categories"

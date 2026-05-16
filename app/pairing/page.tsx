@@ -7,8 +7,6 @@ import type {
   PairingCategory,
   PairingGuideListItem,
   PairingGuideResponse,
-  SeasonFilter,
-  FoodCategoryFilter,
 } from "@/app/lib/types";
 import EmptyState from "@/app/components/ui/empty-state";
 
@@ -41,12 +39,11 @@ function PairingCardMobile({ item }: { item: PairingGuideListItem }) {
   return (
     <Link href={`/pairing/${item.id}`} className="group block bg-surface border border-border rounded-2xl p-4 shadow-[0px_4px_20px_0px_rgba(43,58,103,0.03)] hover:border-accent transition-colors">
       <div className="flex gap-2 mb-2">
-        <span className="px-2 py-0.5 text-[10px] font-body font-bold tracking-tight rounded-full bg-surface-raised text-accent uppercase">
-          {item.temperature}
-        </span>
-        <span className="px-2 py-0.5 text-[10px] font-body font-bold tracking-tight rounded-full bg-surface-raised text-accent uppercase">
-          {item.season}
-        </span>
+        {item.temperature && (
+          <span className="px-2 py-0.5 text-[10px] font-body font-bold tracking-tight rounded-full bg-surface-raised text-accent uppercase">
+            {item.temperature}
+          </span>
+        )}
       </div>
 
       <h3 className="font-display font-bold text-lg text-text-primary">
@@ -84,14 +81,13 @@ function PairingCardDesktop({ item }: { item: PairingGuideListItem }) {
     <Link href={`/pairing/${item.id}`} className="group block bg-surface border border-border/20 rounded-tl-[48px] overflow-hidden hover:border-accent transition-colors">
       <div className="relative h-[360px] lg:h-[420px] bg-surface-raised overflow-hidden flex items-center justify-center">
         <span className="text-8xl group-hover:scale-110 transition-transform">{item.emoji}</span>
-        <div className="absolute top-6 right-6 flex flex-col gap-2">
-          <span className="px-3 py-1 text-[10px] font-body font-bold tracking-wider rounded-full bg-accent/90 text-white backdrop-blur-sm uppercase">
-            {item.season}
-          </span>
-          <span className="px-3 py-1.5 text-[10px] font-body font-bold tracking-wider rounded-full bg-white/90 text-accent border border-accent/10 backdrop-blur-sm uppercase">
-            {item.temperature}
-          </span>
-        </div>
+        {item.temperature && (
+          <div className="absolute top-6 right-6">
+            <span className="px-3 py-1.5 text-[10px] font-body font-bold tracking-wider rounded-full bg-white/90 text-accent border border-accent/10 backdrop-blur-sm uppercase">
+              {item.temperature}
+            </span>
+          </div>
+        )}
       </div>
       <div className="p-8 flex flex-col gap-2">
         <h3 className="font-display font-bold text-2xl text-accent">
@@ -118,39 +114,26 @@ function PairingCardDesktop({ item }: { item: PairingGuideListItem }) {
 
 export default function PairingGuidePage() {
   const [categories, setCategories] = useState<PairingCategory[]>([]);
-  const [seasonFilters, setSeasonFilters] = useState<SeasonFilter[]>([]);
-  const [foodCategoryFilters, setFoodCategoryFilters] = useState<FoodCategoryFilter[]>([]);
-  const [activeSeason, setActiveSeason] = useState("all");
-  const [activeFood, setActiveFood] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [loadState, setLoadState] = useState<"loading" | "loaded" | "error">("loading");
 
   useEffect(() => {
     apiFetch<PairingGuideResponse>("/pairing-guide")
       .then((data) => {
         setCategories(data.categories);
-        setSeasonFilters(data.filters.seasons);
-        setFoodCategoryFilters(data.filters.foodCategories);
         setLoadState("loaded");
       })
       .catch(() => setLoadState("error"));
   }, []);
 
-  const displayed = activeFood
-    ? categories.filter((c) => c.slug === activeFood)
+  const displayed = activeCategory
+    ? categories.filter((c) => c.slug === activeCategory)
     : categories;
-  const seasonFilter = seasonFilters.find((f) => f.key === activeSeason);
-  const items = displayed.flatMap((cat) =>
-    cat.items.filter((item) => {
-      if (activeSeason === "all" || activeSeason === "your-type") return true;
-      return seasonFilter && "match" in seasonFilter
-        ? item.season === seasonFilter.match
-        : true;
-    })
-  );
+  const items = displayed.flatMap((cat) => cat.items);
   const count = items.length;
 
-  const title = activeFood
-    ? categories.find((c) => c.slug === activeFood)?.title ?? "ペアリングガイド"
+  const title = activeCategory
+    ? categories.find((c) => c.slug === activeCategory)?.title ?? "ペアリングガイド"
     : "ペアリングガイド";
 
   if (loadState === "error") {
@@ -182,31 +165,19 @@ export default function PairingGuidePage() {
           </p>
         </div>
 
-        {/* Season / condition filters */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-3 -mx-6 px-6">
-          {seasonFilters.map((f) => (
-            <FilterChip
-              key={f.key}
-              label={f.label}
-              active={activeSeason === f.key}
-              onClick={() => setActiveSeason(f.key)}
-            />
-          ))}
-        </div>
-
-        {/* Food category filters */}
+        {/* Category filters */}
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-4 -mx-6 px-6">
           <FilterChip
-            label="すべての料理"
-            active={activeFood === null}
-            onClick={() => setActiveFood(null)}
+            label="すべて"
+            active={activeCategory === null}
+            onClick={() => setActiveCategory(null)}
           />
-          {foodCategoryFilters.map((f) => (
+          {categories.map((c) => (
             <FilterChip
-              key={f.key}
-              label={f.label}
-              active={activeFood === f.key}
-              onClick={() => setActiveFood(activeFood === f.key ? null : f.key)}
+              key={c.slug}
+              label={c.label}
+              active={activeCategory === c.slug}
+              onClick={() => setActiveCategory(c.slug)}
             />
           ))}
         </div>
@@ -217,7 +188,7 @@ export default function PairingGuidePage() {
           ))}
           {items.length === 0 && (
             <p className="font-body text-sm text-text-muted text-center py-12">
-              条件に一致するペアリングがありません
+              ペアリングがありません
             </p>
           )}
         </div>
@@ -240,59 +211,34 @@ export default function PairingGuidePage() {
 
         {/* Sidebar + Grid */}
         <div className="flex gap-12 pt-4">
-          <aside className="w-64 shrink-0 flex flex-col gap-10">
-            {/* Food category */}
-            <div>
-              <h3 className="font-body font-bold text-[10px] tracking-widest uppercase text-text-secondary mb-6">
-                Food Category
-              </h3>
-              <div className="flex flex-col gap-3">
+          <aside className="w-64 shrink-0">
+            <h3 className="font-body font-bold text-[10px] tracking-widest uppercase text-text-secondary mb-6">
+              Category
+            </h3>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => setActiveCategory(null)}
+                className={`text-left px-6 py-2.5 rounded-full font-body font-medium text-sm transition-colors cursor-pointer ${
+                  activeCategory === null
+                    ? "bg-accent text-white"
+                    : "bg-surface-raised text-text-primary hover:bg-accent-light"
+                }`}
+              >
+                すべて
+              </button>
+              {categories.map((c) => (
                 <button
-                  onClick={() => setActiveFood(null)}
+                  key={c.slug}
+                  onClick={() => setActiveCategory(c.slug)}
                   className={`text-left px-6 py-2.5 rounded-full font-body font-medium text-sm transition-colors cursor-pointer ${
-                    activeFood === null
+                    activeCategory === c.slug
                       ? "bg-accent text-white"
                       : "bg-surface-raised text-text-primary hover:bg-accent-light"
                   }`}
                 >
-                  すべて
+                  {c.label}
                 </button>
-                {foodCategoryFilters.map((f) => (
-                  <button
-                    key={f.key}
-                    onClick={() => setActiveFood(activeFood === f.key ? null : f.key)}
-                    className={`text-left px-6 py-2.5 rounded-full font-body font-medium text-sm transition-colors cursor-pointer ${
-                      activeFood === f.key
-                        ? "bg-accent text-white"
-                        : "bg-surface-raised text-text-primary hover:bg-accent-light"
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Season / condition */}
-            <div>
-              <h3 className="font-body font-bold text-[10px] tracking-widest uppercase text-text-secondary mb-6">
-                Season / Condition
-              </h3>
-              <div className="flex flex-col gap-3">
-                {seasonFilters.map((f) => (
-                  <button
-                    key={f.key}
-                    onClick={() => setActiveSeason(f.key)}
-                    className={`text-left px-6 py-2.5 rounded-full font-body font-medium text-sm transition-colors cursor-pointer ${
-                      activeSeason === f.key
-                        ? "bg-accent text-white"
-                        : "bg-surface-raised text-text-primary hover:bg-accent-light"
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
+              ))}
             </div>
           </aside>
 
@@ -305,7 +251,7 @@ export default function PairingGuidePage() {
             </div>
             {items.length === 0 && (
               <p className="font-body text-sm text-text-muted text-center py-24">
-                条件に一致するペアリングがありません
+                ペアリングがありません
               </p>
             )}
           </div>

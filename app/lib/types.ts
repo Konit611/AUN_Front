@@ -15,9 +15,17 @@ export interface AdminIngredient {
   amount: string;
 }
 
+export interface AdminSakanaCategory {
+  id: number;
+  slug: string;
+  label: string;
+  position: number;
+}
+
 export interface AdminSakana {
   id: string;
   name: string;
+  categoryId: number;
   emoji: string;
   description: string | null;
   imagePlaceholder: string | null;
@@ -38,6 +46,7 @@ export interface AdminSakana {
 
 export interface AdminSakanaInput {
   name: string;
+  category_id: number;
   emoji: string;
   description: string | null;
   image_placeholder: string | null;
@@ -326,12 +335,6 @@ export interface PairingCategory {
   items: PairingGuideListItem[];
 }
 
-export interface SeasonFilter {
-  key: string;
-  label: string;
-  match?: string;
-}
-
 export interface FoodCategoryFilter {
   key: string;
   label: string;
@@ -339,10 +342,6 @@ export interface FoodCategoryFilter {
 
 export interface PairingGuideResponse {
   categories: PairingCategory[];
-  filters: {
-    seasons: SeasonFilter[];
-    foodCategories: FoodCategoryFilter[];
-  };
 }
 
 /* ── Home ──────────────────────────────────────── */
@@ -432,6 +431,7 @@ export interface SakanaTasteAxes {
 export interface SakanaListItem {
   id: string;
   name: string;
+  categoryId: number;
   emoji: string;
   imagePlaceholder: string | null;
   foodImageUrl: string | null;
@@ -439,6 +439,13 @@ export interface SakanaListItem {
   prepTimeMin: number | null;
   cookTimeMin: number | null;
   difficulty: string | null;
+}
+
+export interface SakanaCategory {
+  id: number;
+  slug: string;
+  label: string;
+  position: number;
 }
 
 export interface SakanaIngredient {

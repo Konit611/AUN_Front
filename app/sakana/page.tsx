@@ -1,6 +1,14 @@
+"use client";
+
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { apiFetch } from "@/app/lib/api";
-import type { PaginatedResponse, SakanaListItem } from "@/app/lib/types";
+import type {
+  PaginatedResponse,
+  SakanaCategory,
+  SakanaListItem,
+} from "@/app/lib/types";
 import EmptyState from "@/app/components/ui/empty-state";
 
 const DIFFICULTY_LABEL: Record<string, string> = {
@@ -25,23 +33,25 @@ function SakanaCard({ sakana }: { sakana: SakanaListItem }) {
   return (
     <Link
       href={`/sakana/${sakana.id}`}
-      className="group block bg-surface border border-border rounded-tl-[32px] rounded-br-[32px] md:rounded-tl-[48px] md:rounded-br-[48px] overflow-hidden hover:border-accent transition-colors"
+      className="group block bg-surface-raised border border-border rounded-tl-[32px] rounded-br-[32px] md:rounded-tl-[48px] md:rounded-br-[48px] overflow-hidden hover:border-accent transition-colors"
     >
-      <div className="h-[200px] md:h-[260px] bg-surface-raised flex items-center justify-center overflow-hidden">
-        {sakana.foodImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={sakana.foodImageUrl}
-            alt={sakana.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-          />
-        ) : (
-          <span className="text-7xl md:text-8xl group-hover:scale-110 transition-transform">
-            {sakana.emoji}
-          </span>
-        )}
+      <div className="bg-white m-4 rounded-tl-[24px] rounded-br-[24px] md:rounded-tl-[32px] md:rounded-br-[32px] overflow-hidden">
+        <div className="h-[200px] md:h-[260px] flex items-center justify-center">
+          {sakana.foodImageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={sakana.foodImageUrl}
+              alt={sakana.name}
+              className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform"
+            />
+          ) : (
+            <span className="text-7xl md:text-8xl group-hover:scale-110 transition-transform">
+              {sakana.emoji}
+            </span>
+          )}
+        </div>
       </div>
-      <div className="p-5 md:p-6 flex flex-col gap-3">
+      <div className="px-6 pb-6 pt-2 flex flex-col gap-3">
         <h3 className="font-display font-bold text-lg md:text-xl text-accent group-hover:text-accent-hover transition-colors">
           {sakana.name}
         </h3>
@@ -62,14 +72,41 @@ function SakanaCard({ sakana }: { sakana: SakanaListItem }) {
   );
 }
 
-export default async function SakanaListPage() {
-  let items: SakanaListItem[];
-  try {
-    const data = await apiFetch<PaginatedResponse<SakanaListItem>>("/sakana");
-    items = data.items;
-  } catch {
-    items = [];
-  }
+export default function SakanaListPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-bg" />}>
+      <SakanaListPageInner />
+    </Suspense>
+  );
+}
+
+function SakanaListPageInner() {
+  const params = useSearchParams();
+  const initialCategory = params.get("category");
+
+  const [items, setItems] = useState<SakanaListItem[]>([]);
+  const [categories, setCategories] = useState<SakanaCategory[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string | null>(
+    initialCategory,
+  );
+  const [loadState, setLoadState] = useState<"loading" | "loaded" | "error">(
+    "loading",
+  );
+
+  useEffect(() => {
+    apiFetch<SakanaCategory[]>("/sakana-categories").then(setCategories);
+  }, []);
+
+  useEffect(() => {
+    const qs = activeCategory ? `?category=${activeCategory}` : "";
+    setLoadState("loading");
+    apiFetch<PaginatedResponse<SakanaListItem>>(`/sakana${qs}`)
+      .then((data) => {
+        setItems(data.items);
+        setLoadState("loaded");
+      })
+      .catch(() => setLoadState("error"));
+  }, [activeCategory]);
 
   return (
     <div className="min-h-screen bg-bg">
@@ -86,21 +123,116 @@ export default async function SakanaListPage() {
           </p>
         </div>
 
-        {items.length === 0 ? (
-          <EmptyState
-            title="肴データを表示できませんでした"
-            description="一時的に情報を取得できませんでした。しばらくしてから再度お試しください。"
-            actionLabel="ホームに戻る"
-            actionHref="/"
+        {/* Mobile filter chips */}
+        <div className="md:hidden flex gap-2 overflow-x-auto scrollbar-hide pb-4 -mx-6 px-6 mb-2">
+          <FilterChip
+            label="すべて"
+            active={activeCategory === null}
+            onClick={() => setActiveCategory(null)}
           />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {items.map((sakana) => (
-              <SakanaCard key={sakana.id} sakana={sakana} />
-            ))}
+          {categories.map((c) => (
+            <FilterChip
+              key={c.id}
+              label={c.label}
+              active={activeCategory === c.slug}
+              onClick={() => setActiveCategory(c.slug)}
+            />
+          ))}
+        </div>
+
+        <div className="md:flex md:gap-12 md:pt-4">
+          {/* Desktop sidebar */}
+          <aside className="hidden md:block w-56 shrink-0">
+            <h3 className="font-body font-bold text-[10px] tracking-widest uppercase text-text-secondary mb-6">
+              Category
+            </h3>
+            <div className="flex flex-col gap-3">
+              <SidebarItem
+                label="すべて"
+                active={activeCategory === null}
+                onClick={() => setActiveCategory(null)}
+              />
+              {categories.map((c) => (
+                <SidebarItem
+                  key={c.id}
+                  label={c.label}
+                  active={activeCategory === c.slug}
+                  onClick={() => setActiveCategory(c.slug)}
+                />
+              ))}
+            </div>
+          </aside>
+
+          <div className="flex-1">
+            {loadState === "error" ? (
+              <EmptyState
+                title="肴データを表示できませんでした"
+                description="一時的に情報を取得できませんでした。しばらくしてから再度お試しください。"
+                actionLabel="ホームに戻る"
+                actionHref="/"
+              />
+            ) : items.length === 0 ? (
+              <p className="font-body text-sm text-text-muted text-center py-12">
+                {loadState === "loading"
+                  ? "読み込み中..."
+                  : "条件に一致する肴がありません"}
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                {items.map((sakana) => (
+                  <SakanaCard key={sakana.id} sakana={sakana} />
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
+  );
+}
+
+function FilterChip({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-6 py-2 rounded-full font-body font-medium text-sm whitespace-nowrap transition-colors cursor-pointer ${
+        active
+          ? "bg-accent text-white"
+          : "bg-accent-light text-accent hover:bg-accent/20"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function SidebarItem({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`text-left px-6 py-2.5 rounded-full font-body font-medium text-sm transition-colors cursor-pointer ${
+        active
+          ? "bg-accent text-white"
+          : "bg-surface-raised text-text-primary hover:bg-accent-light"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
