@@ -36,9 +36,9 @@ export default async function EncyclopediaPage() {
           <Link
             key={sake.id}
             href={`/encyclopedia/${sake.id}`}
-            className="group bg-surface border border-border rounded-tl-[32px] rounded-br-[32px] md:rounded-tl-[48px] md:rounded-br-[48px] overflow-hidden hover:border-accent transition-colors"
+            className="group bg-surface-raised border border-border rounded-tl-[32px] rounded-br-[32px] md:rounded-tl-[48px] md:rounded-br-[48px] overflow-hidden hover:border-accent transition-colors"
           >
-            <div className="bg-surface-raised m-4 rounded-tl-[24px] rounded-br-[24px] md:rounded-tl-[32px] md:rounded-br-[32px] overflow-hidden">
+            <div className="bg-white m-4 rounded-tl-[24px] rounded-br-[24px] md:rounded-tl-[32px] md:rounded-br-[32px] overflow-hidden">
               <div className="h-[240px] md:h-[300px] flex items-center justify-center">
                 {sake.imageUrl ? (
                   /* eslint-disable-next-line @next/next/no-img-element */

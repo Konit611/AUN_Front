@@ -58,34 +58,35 @@ function FeaturedSakeCard({ sake }: { sake: FeaturedSake | null }) {
     <div className="relative w-full max-w-[342px] md:max-w-[454px]">
       <Link
         href={sake ? `/encyclopedia/${sake.id}` : "/encyclopedia"}
-        className="group block bg-surface-raised rounded-tl-[48px] rounded-br-[48px] overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+        className="group relative block bg-surface-raised border border-border rounded-tl-[48px] rounded-br-[48px] overflow-hidden hover:border-accent transition-colors"
       >
+        {/* Badge */}
+        <span
+          className={`absolute top-6 right-6 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${
+            sake?.personalized
+              ? "bg-accent text-white"
+              : "bg-accent/10 text-accent"
+          }`}
+        >
+          {sake?.personalized ? "あなたへのおすすめ" : "今日のおすすめ"}
+        </span>
+
         {/* Visual */}
-        <div className="relative bg-gradient-to-br from-surface-raised to-border aspect-[454/280] flex items-center justify-center overflow-hidden">
+        <div className="bg-white m-4 rounded-tl-[32px] rounded-br-[32px] md:rounded-tl-[40px] md:rounded-br-[40px] overflow-hidden aspect-[4/5] flex items-center justify-center">
           {sake?.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={sake.imageUrl}
               alt={sake.name}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-contain p-6 transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
             <span className="text-7xl md:text-8xl">🍶</span>
           )}
-          {/* Badge */}
-          <span
-            className={`absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${
-              sake?.personalized
-                ? "bg-accent text-white"
-                : "bg-white/90 text-accent backdrop-blur-sm"
-            }`}
-          >
-            {sake?.personalized ? "あなたへのおすすめ" : "今日のおすすめ"}
-          </span>
         </div>
 
         {/* Info */}
-        <div className="px-6 py-6 md:px-8 md:py-7 flex flex-col gap-3 bg-surface">
+        <div className="px-6 pb-6 pt-2 md:px-8 md:pb-7 flex flex-col gap-3">
           {sake ? (
             <>
               <div className="flex flex-col gap-1">
