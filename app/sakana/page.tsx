@@ -24,7 +24,13 @@ function totalTime(s: SakanaListItem): string | null {
   return total > 0 ? `${total}分` : null;
 }
 
-function SakanaCard({ sakana }: { sakana: SakanaListItem }) {
+function SakanaCard({
+  sakana,
+  categoryLabel,
+}: {
+  sakana: SakanaListItem;
+  categoryLabel: string | null;
+}) {
   const time = totalTime(sakana);
   const difficulty = sakana.difficulty
     ? DIFFICULTY_LABEL[sakana.difficulty] ?? sakana.difficulty
@@ -56,6 +62,11 @@ function SakanaCard({ sakana }: { sakana: SakanaListItem }) {
           {sakana.name}
         </h3>
         <div className="flex flex-wrap gap-2">
+          {categoryLabel && (
+            <span className="px-3 py-0.5 text-[10px] font-body font-bold tracking-widest uppercase rounded-full bg-accent text-white">
+              {categoryLabel}
+            </span>
+          )}
           {time && (
             <span className="px-3 py-0.5 text-[10px] font-body font-bold tracking-widest uppercase rounded-full bg-accent/10 text-accent">
               {time}
@@ -179,9 +190,16 @@ function SakanaListPageInner() {
               </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                {items.map((sakana) => (
-                  <SakanaCard key={sakana.id} sakana={sakana} />
-                ))}
+                {items.map((sakana) => {
+                  const cat = categories.find((c) => c.id === sakana.categoryId);
+                  return (
+                    <SakanaCard
+                      key={sakana.id}
+                      sakana={sakana}
+                      categoryLabel={cat?.label ?? null}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>

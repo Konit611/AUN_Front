@@ -464,6 +464,8 @@ export interface SakanaPairedSake {
 }
 
 export interface SakanaDetail extends SakanaListItem {
+  categoryLabel: string | null;
+  categorySlug: string | null;
   description: string | null;
   ingredients: SakanaIngredient[];
   steps: string[];

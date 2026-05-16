@@ -168,6 +168,14 @@ export default async function SakanaDetailPage({ params }: Props) {
                 {sakana.name}
               </h1>
               <div className="flex flex-wrap gap-2 mt-1">
+                {sakana.categoryLabel && (
+                  <Link
+                    href={`/sakana?category=${sakana.categorySlug}`}
+                    className="px-3 py-1 text-[10px] font-body font-bold tracking-widest uppercase rounded-full bg-accent text-white hover:bg-accent-hover transition-colors"
+                  >
+                    {sakana.categoryLabel}
+                  </Link>
+                )}
                 {time && (
                   <span className="px-3 py-1 text-[10px] font-body font-bold tracking-widest uppercase rounded-full bg-accent/10 text-accent">
                     {time}分
