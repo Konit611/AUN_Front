@@ -11,7 +11,7 @@ export default function DetailHero({ sake }: DetailHeroProps) {
       <div className="md:hidden flex flex-col gap-8">
         <div className="bg-surface-raised rounded-tl-[48px] rounded-br-[48px] p-4">
           <div className="rounded-tl-[32px] rounded-br-[32px] overflow-hidden">
-            <div className="h-[388px] bg-surface-raised flex items-center justify-center">
+            <div className="h-[388px] bg-white flex items-center justify-center">
               {sake.imageUrl ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
@@ -41,6 +41,9 @@ export default function DetailHero({ sake }: DetailHeroProps) {
           </h1>
           <p className="font-body font-medium text-sm text-text-secondary">
             {sake.brewery} / {sake.region}
+          </p>
+          <p className="font-body text-base leading-[26px] text-text-secondary mt-2">
+            {sake.description}
           </p>
         </div>
       </div>
