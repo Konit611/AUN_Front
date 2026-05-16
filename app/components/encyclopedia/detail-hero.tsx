@@ -61,13 +61,10 @@ export default function DetailHero({ sake }: DetailHeroProps) {
             <p className="font-body text-base leading-[26px] text-text-secondary">
               {sake.description}
             </p>
-            <span
-              className="inline-flex items-center gap-3 bg-accent/40 text-white font-body font-bold text-lg px-10 py-5 rounded-full w-fit cursor-not-allowed"
-              aria-disabled="true"
-            >
-              購入する（準備中）
-              <ArrowRight />
-            </span>
+            <PurchaseButtons
+              amazonUrl={sake.amazonUrl}
+              rakutenUrl={sake.rakutenUrl}
+            />
           </div>
         </div>
         <div className="flex flex-col items-center justify-center relative">
@@ -92,5 +89,55 @@ function ArrowRight() {
         strokeLinejoin="round"
       />
     </svg>
+  );
+}
+
+function PurchaseButtons({
+  amazonUrl,
+  rakutenUrl,
+}: {
+  amazonUrl: string | null;
+  rakutenUrl: string | null;
+}) {
+  const baseCls =
+    "inline-flex items-center gap-3 font-body font-bold text-lg px-10 py-5 rounded-full w-fit";
+
+  if (!amazonUrl && !rakutenUrl) {
+    return (
+      <span
+        className={`${baseCls} bg-accent/40 text-white cursor-not-allowed`}
+        aria-disabled="true"
+      >
+        購入する（準備中）
+        <ArrowRight />
+      </span>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap gap-3">
+      {amazonUrl && (
+        <a
+          href={amazonUrl}
+          target="_blank"
+          rel="noopener noreferrer sponsored"
+          className={`${baseCls} bg-accent text-white hover:bg-accent-hover transition-colors`}
+        >
+          Amazonで購入
+          <ArrowRight />
+        </a>
+      )}
+      {rakutenUrl && (
+        <a
+          href={rakutenUrl}
+          target="_blank"
+          rel="noopener noreferrer sponsored"
+          className={`${baseCls} bg-accent text-white hover:bg-accent-hover transition-colors`}
+        >
+          楽天で購入
+          <ArrowRight />
+        </a>
+      )}
+    </div>
   );
 }

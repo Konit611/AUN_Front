@@ -41,7 +41,7 @@ export default async function SakeDetailPage({ params }: SakeDetailPageProps) {
         </div>
       </div>
 
-      <DetailBottomBar purchaseUrl={sake.purchaseUrl} />
+      <DetailBottomBar amazonUrl={sake.amazonUrl} rakutenUrl={sake.rakutenUrl} />
     </div>
   );
 }

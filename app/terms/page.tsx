@@ -56,10 +56,19 @@ export default function TermsPage() {
               当サービスは、必要に応じて本規約を変更することがあります。変更後の規約は本ページで掲示された時点から効力を生じます。
             </p>
           </Section>
+
+          <Section title="第7条 （アフィリエイトプログラム）">
+            <p>
+              AUNは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムの参加者です。
+            </p>
+            <p className="mt-3">
+              また、AUNは楽天市場をはじめとする各サービスを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、楽天アフィリエイトの参加者です。
+            </p>
+          </Section>
         </article>
 
         <p className="mt-12 font-body text-sm text-text-muted">
-          最終更新日：2026年5月6日 ・{" "}
+          最終更新日：2026年5月16日 ・{" "}
           <Link href="/" className="text-accent hover:text-accent-hover">
             ホームに戻る
           </Link>

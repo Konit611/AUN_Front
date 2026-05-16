@@ -98,7 +98,8 @@ export interface AdminSake {
   bitterness: number;
   aroma: number;
   imageUrl: string | null;
-  purchaseUrl: string | null;
+  amazonUrl: string | null;
+  rakutenUrl: string | null;
   flavors: AdminSakeFlavor[];
   pairings: AdminSakePairing[];
 }
@@ -131,7 +132,8 @@ export interface AdminSakeInput {
   bitterness: number;
   aroma: number;
   image_url: string | null;
-  purchase_url: string | null;
+  amazon_url: string | null;
+  rakuten_url: string | null;
   flavors: { flavor_id: string; is_primary: boolean }[];
   pairings: { sakana_id: string; description: string; position: number }[];
 }
@@ -405,7 +407,8 @@ export interface SakeDetail {
   rice: string;
   polishing: string;
   imageUrl: string | null;
-  purchaseUrl: string | null;
+  amazonUrl: string | null;
+  rakutenUrl: string | null;
   flavorTags: { label: string; primary: boolean }[];
   servingTags: string[];
   pairings: SakeDetailPairing[];

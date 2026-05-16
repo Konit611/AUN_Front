@@ -66,7 +66,8 @@ export default function SakeForm({ initial }: Props) {
   );
   const [servingSeason, setServingSeason] = useState(initial?.servingSeason ?? "");
   const [imageUrl, setImageUrl] = useState(initial?.imageUrl ?? "");
-  const [purchaseUrl, setPurchaseUrl] = useState(initial?.purchaseUrl ?? "");
+  const [amazonUrl, setAmazonUrl] = useState(initial?.amazonUrl ?? "");
+  const [rakutenUrl, setRakutenUrl] = useState(initial?.rakutenUrl ?? "");
 
   const [axes, setAxes] = useState<Record<AxisKey, number>>(() => ({
     sweetness: initial?.sweetness ?? 0.5,
@@ -156,7 +157,8 @@ export default function SakeForm({ initial }: Props) {
       serving_season: servingSeason.trim(),
       ...axes,
       image_url: imageUrl.trim() || null,
-      purchase_url: purchaseUrl.trim() || null,
+      amazon_url: amazonUrl.trim() || null,
+      rakuten_url: rakutenUrl.trim() || null,
       flavors: cleanFlavors,
       pairings: cleanPairings,
     };
@@ -320,12 +322,21 @@ export default function SakeForm({ initial }: Props) {
                 className={inputCls}
               />
             </Field>
-            <Field label="購入リンク (任意)">
+            <Field label="Amazonリンク (任意)">
               <input
                 type="url"
-                value={purchaseUrl}
-                onChange={(e) => setPurchaseUrl(e.target.value)}
-                placeholder="https://..."
+                value={amazonUrl}
+                onChange={(e) => setAmazonUrl(e.target.value)}
+                placeholder="https://www.amazon.co.jp/..."
+                className={inputCls}
+              />
+            </Field>
+            <Field label="楽天リンク (任意)">
+              <input
+                type="url"
+                value={rakutenUrl}
+                onChange={(e) => setRakutenUrl(e.target.value)}
+                placeholder="https://item.rakuten.co.jp/..."
                 className={inputCls}
               />
             </Field>
