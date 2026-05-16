@@ -387,6 +387,7 @@ export interface SakeListItem {
   brewery: string;
   region: string;
   servingTags: string[];
+  imageUrl: string | null;
 }
 
 export interface SakeDetailPairing {

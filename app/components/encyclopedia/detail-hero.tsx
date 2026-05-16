@@ -12,7 +12,16 @@ export default function DetailHero({ sake }: DetailHeroProps) {
         <div className="bg-surface-raised rounded-tl-[48px] rounded-br-[48px] p-4">
           <div className="rounded-tl-[32px] rounded-br-[32px] overflow-hidden">
             <div className="h-[388px] bg-surface-raised flex items-center justify-center">
-              <span className="text-6xl">🍶</span>
+              {sake.imageUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={sake.imageUrl}
+                  alt={sake.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-6xl">🍶</span>
+              )}
             </div>
           </div>
         </div>
@@ -69,8 +78,17 @@ export default function DetailHero({ sake }: DetailHeroProps) {
         </div>
         <div className="flex flex-col items-center justify-center relative">
           <div className="absolute -inset-7 -rotate-2 bg-accent/5 rounded-tl-[48px] rounded-br-[48px]" />
-          <div className="relative aspect-[4/5] w-full bg-white rounded-tl-[48px] rounded-br-[48px] overflow-hidden flex items-center justify-center p-12">
-            <span className="text-8xl">🍶</span>
+          <div className="relative aspect-[4/5] w-full bg-white rounded-tl-[48px] rounded-br-[48px] overflow-hidden flex items-center justify-center">
+            {sake.imageUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={sake.imageUrl}
+                alt={sake.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-8xl">🍶</span>
+            )}
           </div>
         </div>
       </div>

@@ -40,9 +40,18 @@ export default async function EncyclopediaPage() {
           >
             <div className="bg-surface-raised m-4 rounded-tl-[24px] rounded-br-[24px] md:rounded-tl-[32px] md:rounded-br-[32px] overflow-hidden">
               <div className="h-[240px] md:h-[300px] flex items-center justify-center">
-                <span className="text-5xl group-hover:scale-110 transition-transform">
-                  🍶
-                </span>
+                {sake.imageUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={sake.imageUrl}
+                    alt={sake.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                ) : (
+                  <span className="text-5xl group-hover:scale-110 transition-transform">
+                    🍶
+                  </span>
+                )}
               </div>
             </div>
             <div className="px-6 pb-6 pt-2 flex flex-col gap-3">
