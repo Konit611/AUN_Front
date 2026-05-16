@@ -36,10 +36,13 @@ export async function uploadAdminImage(
   if (sign.stub) {
     return fileToDataURL(file);
   }
-  await fetch(sign.upload_url, {
+  const res = await fetch(sign.upload_url, {
     method: "PUT",
     headers: sign.headers,
     body: file,
   });
+  if (!res.ok) {
+    throw new Error(`S3 upload failed: ${res.status} ${res.statusText}`);
+  }
   return sign.public_url;
 }

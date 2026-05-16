@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiPost, apiPut, apiDelete, ApiError } from "@/app/lib/api";
+import { uploadAdminImage } from "@/app/lib/admin-upload";
 import type { AdminSakana, AdminSakanaInput } from "@/app/lib/types";
 import Stepper from "./stepper";
 import ImageUploader from "./image-uploader";
@@ -48,6 +49,7 @@ export default function SakanaForm({ initial }: Props) {
     initial?.imagePlaceholder ?? "",
   );
   const [foodImageUrl, setFoodImageUrl] = useState(initial?.foodImageUrl ?? "");
+  const [pendingFoodImage, setPendingFoodImage] = useState<File | null>(null);
   const [axes, setAxes] = useState<Record<AxisKey, number>>(() => ({
     sweetness: initial?.sweetness ?? 0.5,
     umami: initial?.umami ?? 0.5,
@@ -105,12 +107,27 @@ export default function SakanaForm({ initial }: Props) {
       .filter((i) => i.name && i.amount);
     const cleanSteps = steps.map((s) => s.trim()).filter(Boolean);
 
+    let finalFoodImageUrl: string | null = foodImageUrl.trim() || null;
+    try {
+      if (pendingFoodImage) {
+        finalFoodImageUrl = await uploadAdminImage(pendingFoodImage, "sakana");
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? `画像アップロードに失敗しました: ${err.message}`
+          : "画像アップロードに失敗しました",
+      );
+      setSubmitting(false);
+      return;
+    }
+
     const body: AdminSakanaInput = {
       name: name.trim(),
       emoji: emoji.trim(),
       description: description.trim() || null,
       image_placeholder: imagePlaceholder.trim() || null,
-      food_image_url: foodImageUrl.trim() || null,
+      food_image_url: finalFoodImageUrl,
       ...axes,
       ingredients: cleanIngredients.length > 0 ? cleanIngredients : null,
       steps: cleanSteps.length > 0 ? cleanSteps : null,
@@ -213,9 +230,13 @@ export default function SakanaForm({ initial }: Props) {
           </div>
           <Field label="写真">
             <ImageUploader
-              value={foodImageUrl || null}
-              onChange={(url) => setFoodImageUrl(url ?? "")}
-              prefix="sakana"
+              url={foodImageUrl || null}
+              pendingFile={pendingFoodImage}
+              onPick={setPendingFoodImage}
+              onRemove={() => {
+                setFoodImageUrl("");
+                setPendingFoodImage(null);
+              }}
               aspect="photo"
             />
           </Field>

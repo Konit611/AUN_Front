@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch, apiPost, apiPut, apiDelete, ApiError } from "@/app/lib/api";
+import { uploadAdminImage } from "@/app/lib/admin-upload";
 import type {
   AdminSake,
   AdminSakeInput,
@@ -66,6 +67,7 @@ export default function SakeForm({ initial }: Props) {
   );
   const [servingSeason, setServingSeason] = useState(initial?.servingSeason ?? "");
   const [imageUrl, setImageUrl] = useState(initial?.imageUrl ?? "");
+  const [pendingImage, setPendingImage] = useState<File | null>(null);
   const [amazonUrl, setAmazonUrl] = useState(initial?.amazonUrl ?? "");
   const [rakutenUrl, setRakutenUrl] = useState(initial?.rakutenUrl ?? "");
 
@@ -145,6 +147,21 @@ export default function SakeForm({ initial }: Props) {
         position: i,
       }));
 
+    let finalImageUrl: string | null = imageUrl.trim() || null;
+    try {
+      if (pendingImage) {
+        finalImageUrl = await uploadAdminImage(pendingImage, "sake");
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? `画像アップロードに失敗しました: ${err.message}`
+          : "画像アップロードに失敗しました",
+      );
+      setSubmitting(false);
+      return;
+    }
+
     const baseBody: Omit<AdminSakeInput, "id"> = {
       name: name.trim(),
       brewery: brewery.trim(),
@@ -156,7 +173,7 @@ export default function SakeForm({ initial }: Props) {
       serving_temperature: servingTemperature.trim(),
       serving_season: servingSeason.trim(),
       ...axes,
-      image_url: imageUrl.trim() || null,
+      image_url: finalImageUrl,
       amazon_url: amazonUrl.trim() || null,
       rakuten_url: rakutenUrl.trim() || null,
       flavors: cleanFlavors,
@@ -343,9 +360,13 @@ export default function SakeForm({ initial }: Props) {
           </div>
           <Field label="写真">
             <ImageUploader
-              value={imageUrl || null}
-              onChange={(url) => setImageUrl(url ?? "")}
-              prefix="sake"
+              url={imageUrl || null}
+              pendingFile={pendingImage}
+              onPick={setPendingImage}
+              onRemove={() => {
+                setImageUrl("");
+                setPendingImage(null);
+              }}
               aspect="photo"
             />
           </Field>
