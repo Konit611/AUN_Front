@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { SakeRecommendation } from "@/app/lib/types";
 
 interface SakeCardProps {
@@ -14,10 +15,22 @@ export default function SakeCard({ sake, variant }: SakeCardProps) {
 
 function MobileSakeCard({ sake }: { sake: SakeRecommendation }) {
   return (
-    <div className="min-w-[280px] w-[280px] bg-surface border border-border rounded-xl p-5 shadow-sm">
-      <div className="bg-surface-raised rounded-[32px] overflow-hidden">
-        <div className="h-[298px] bg-surface-raised flex items-center justify-center">
-          <span className="text-text-muted text-sm">🍶</span>
+    <Link
+      href={`/encyclopedia/${sake.id}`}
+      className="group min-w-[280px] w-[280px] bg-surface-raised border border-border rounded-xl p-4 hover:border-accent transition-colors"
+    >
+      <div className="bg-white rounded-[24px] overflow-hidden">
+        <div className="h-[298px] flex items-center justify-center">
+          {sake.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={sake.imageUrl}
+              alt={sake.name}
+              className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform"
+            />
+          ) : (
+            <span className="text-6xl">🍶</span>
+          )}
         </div>
       </div>
       <div className="pt-4 flex flex-col gap-3">
@@ -27,7 +40,7 @@ function MobileSakeCard({ sake }: { sake: SakeRecommendation }) {
               key={tag.label}
               className={`px-2 py-0.5 text-[10px] font-body font-bold tracking-[1px] rounded-sm ${
                 tag.variant === "primary"
-                  ? "bg-surface-raised text-accent"
+                  ? "bg-accent/10 text-accent"
                   : "bg-accent text-white"
               }`}
             >
@@ -43,23 +56,37 @@ function MobileSakeCard({ sake }: { sake: SakeRecommendation }) {
             {sake.brewery}
           </p>
         </div>
-        <div className="border-t border-surface-raised pt-2 flex justify-end">
-          <span className="font-body font-bold text-xs text-accent flex items-center gap-1">
+        <div className="border-t border-border pt-2 flex justify-end">
+          <span className="font-body font-bold text-xs text-accent flex items-center gap-1 group-hover:text-accent-hover transition-colors">
             詳しく見る
             <ChevronRight />
           </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
 function DesktopSakeCard({ sake }: { sake: SakeRecommendation }) {
   return (
-    <div className="flex flex-col gap-6">
-      <div className="bg-surface-raised rounded-[48px] overflow-hidden">
-        <div className="h-[505px] flex items-center justify-center">
-          <span className="text-text-muted text-2xl">🍶</span>
+    <Link
+      href={`/encyclopedia/${sake.id}`}
+      className="group flex flex-col gap-6"
+    >
+      <div className="bg-surface-raised border border-border rounded-[48px] p-4 group-hover:border-accent transition-colors">
+        <div className="bg-white rounded-[36px] overflow-hidden">
+          <div className="h-[480px] flex items-center justify-center">
+            {sake.imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={sake.imageUrl}
+                alt={sake.name}
+                className="w-full h-full object-contain p-6 group-hover:scale-105 transition-transform"
+              />
+            ) : (
+              <span className="text-8xl">🍶</span>
+            )}
+          </div>
         </div>
       </div>
       <div className="flex flex-col gap-3">
@@ -77,14 +104,14 @@ function DesktopSakeCard({ sake }: { sake: SakeRecommendation }) {
             </span>
           ))}
         </div>
-        <h3 className="font-display text-xl leading-7 text-accent">
+        <h3 className="font-display text-xl leading-7 text-accent group-hover:text-accent-hover transition-colors">
           {sake.name}
         </h3>
         <p className="font-body font-light text-sm text-text-secondary leading-5">
           {sake.region}・{sake.brewery} | {sake.description}
         </p>
       </div>
-    </div>
+    </Link>
   );
 }
 

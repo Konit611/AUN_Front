@@ -50,14 +50,14 @@ export default function SakeRecommendationsSection({
         {/* Mobile: horizontal scroll */}
         <div className="md:hidden flex gap-6 overflow-x-auto scrollbar-hide -mx-6 px-6">
           {sakes.map((sake) => (
-            <SakeCard key={sake.name} sake={sake} variant="mobile" />
+            <SakeCard key={sake.id} sake={sake} variant="mobile" />
           ))}
         </div>
 
         {/* PC: 3-column grid */}
         <div className="hidden md:grid grid-cols-3 gap-10">
           {sakes.map((sake) => (
-            <SakeCard key={sake.name} sake={sake} variant="desktop" />
+            <SakeCard key={sake.id} sake={sake} variant="desktop" />
           ))}
         </div>
       </div>

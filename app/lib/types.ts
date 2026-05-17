@@ -477,27 +477,29 @@ export interface SakanaDetail extends SakanaListItem {
 /* ── Quiz Results ─────────────────────────────── */
 
 export interface SakeRecommendation {
+  id: string;
   name: string;
   brewery: string;
   region: string;
   description: string;
-  imagePath: string;
+  imageUrl: string | null;
   tags: { label: string; variant: "primary" | "secondary" }[];
 }
 
 export interface PairingRecommendation {
+  id: string;
   emoji: string;
   foodName: string;
   sakeName: string;
   temperature: string;
   description: string;
+  foodImageUrl: string | null;
+  sakeImageUrl: string | null;
 }
 
 export interface ResultData {
   sakes: SakeRecommendation[];
   pairings: PairingRecommendation[];
-  pairingSectionTitle: string;
-  pairingSectionDescription: string;
 }
 
 /* ── Journal ──────────────────────────────────── */

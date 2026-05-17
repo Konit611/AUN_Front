@@ -3,15 +3,11 @@ import PairingCard from "./pairing-card";
 
 interface PairingsSectionProps {
   pairings: PairingRecommendation[];
-  title: string;
-  description: string;
 }
 
-export default function PairingsSection({
-  pairings,
-  title,
-  description,
-}: PairingsSectionProps) {
+export default function PairingsSection({ pairings }: PairingsSectionProps) {
+  if (pairings.length === 0) return null;
+
   return (
     <section className="bg-surface px-6 py-24 md:bg-bg md:px-8 md:py-0">
       <div className="max-w-[1280px] mx-auto">
@@ -22,13 +18,13 @@ export default function PairingsSection({
               Flavor Harmony
             </p>
             <h2 className="font-display text-[30px] leading-9 text-accent text-center">
-              あなたにおすすめのペアリング
+              おすすめの一献に寄り添う肴
             </h2>
           </div>
           <div className="flex flex-col gap-8">
             {pairings.map((pairing) => (
               <PairingCard
-                key={pairing.foodName}
+                key={pairing.id}
                 pairing={pairing}
                 variant="mobile"
               />
@@ -43,16 +39,16 @@ export default function PairingsSection({
               The Alchemy of Flavor
             </p>
             <h2 className="font-display text-4xl leading-10 text-accent">
-              {title}
+              おすすめの一献に寄り添う肴
             </h2>
             <p className="font-body font-light text-base text-text-secondary leading-relaxed pt-2">
-              {description}
+              あなたへのおすすめ酒に、キュレーターが選んだ肴を添えて。
             </p>
           </div>
           <div className="col-span-8 flex flex-col gap-6">
             {pairings.map((pairing) => (
               <PairingCard
-                key={pairing.foodName}
+                key={pairing.id}
                 pairing={pairing}
                 variant="desktop"
               />

@@ -81,11 +81,7 @@ export default async function ResultPage({ params }: ResultPageProps) {
         typeCode={persona.code}
       />
 
-      <PairingsSection
-        pairings={data.pairings}
-        title={data.pairingSectionTitle}
-        description={data.pairingSectionDescription}
-      />
+      <PairingsSection pairings={data.pairings} />
 
       <CompatibilitySection
         userCode={persona.code}
