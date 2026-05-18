@@ -70,7 +70,7 @@ export default function Header() {
               <circle cx="200" cy="200" r="60" fill="black" />
             </mask>
             <path
-              d="M0 100C0 44.7715 44.7715 0 100 0H400V300C400 355.228 355.228 400 300 400H0V100Z"
+              d="M0 160C0 71.6344 71.6344 0 160 0H400V240C400 328.366 328.366 400 240 400H0V160Z"
               fill="currentColor"
               mask="url(#aun-logo-cutout)"
             />
