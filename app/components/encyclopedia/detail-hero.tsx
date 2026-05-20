@@ -36,15 +36,13 @@ export default function DetailHero({ sake }: DetailHeroProps) {
               </span>
             ))}
           </div>
-          <h1 className="font-display font-bold text-[28px] leading-[35px] text-accent">
+          <h1 className="font-display font-bold text-[28px] leading-[35px] text-accent whitespace-pre-line">
             {sake.name}
           </h1>
           <p className="font-body font-medium text-sm text-text-secondary">
             {sake.brewery} / {sake.region}
           </p>
-          <p className="font-body text-base leading-[26px] text-text-secondary mt-2">
-            {sake.description}
-          </p>
+          <Description text={sake.description} className="mt-2" />
         </div>
       </div>
 
@@ -62,7 +60,7 @@ export default function DetailHero({ sake }: DetailHeroProps) {
                 </span>
               ))}
             </div>
-            <h1 className="font-display font-extrabold text-[72px] leading-[72px] tracking-[-3.6px] text-accent">
+            <h1 className="font-display font-extrabold text-[72px] leading-[72px] tracking-[-3.6px] text-accent whitespace-pre-line">
               {sake.name}
             </h1>
             <p className="font-body font-medium text-xl tracking-wider text-text-secondary">
@@ -70,9 +68,7 @@ export default function DetailHero({ sake }: DetailHeroProps) {
             </p>
           </div>
           <div className="flex flex-col gap-8 max-w-[448px]">
-            <p className="font-body text-base leading-[26px] text-text-secondary">
-              {sake.description}
-            </p>
+            <Description text={sake.description} />
             <PurchaseButtons
               amazonUrl={sake.amazonUrl}
               rakutenUrl={sake.rakutenUrl}
@@ -96,6 +92,28 @@ export default function DetailHero({ sake }: DetailHeroProps) {
         </div>
       </div>
     </section>
+  );
+}
+
+function Description({
+  text,
+  className = "",
+}: {
+  text: string;
+  className?: string;
+}) {
+  const paragraphs = text.split(/\n{2,}/);
+  return (
+    <div className={`flex flex-col gap-4 ${className}`}>
+      {paragraphs.map((p, i) => (
+        <p
+          key={i}
+          className="font-body text-base leading-[26px] text-text-secondary text-justify [text-justify:inter-character] [line-break:strict] whitespace-pre-line"
+        >
+          {p}
+        </p>
+      ))}
+    </div>
   );
 }
 
