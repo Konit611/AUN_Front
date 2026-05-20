@@ -4,7 +4,15 @@ interface DetailHeroProps {
   sake: SakeDetail;
 }
 
+// Treat the two-character sequence "\n" as a real newline so editors can
+// type either an escape sequence or a real return in the DB cell.
+function unescapeNewlines(text: string) {
+  return text.replace(/\\n/g, "\n");
+}
+
 export default function DetailHero({ sake }: DetailHeroProps) {
+  const name = unescapeNewlines(sake.name);
+  const description = unescapeNewlines(sake.description);
   return (
     <section>
       {/* Mobile */}
@@ -16,7 +24,7 @@ export default function DetailHero({ sake }: DetailHeroProps) {
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={sake.imageUrl}
-                  alt={sake.name}
+                  alt={name}
                   className="w-full h-full object-contain p-6"
                 />
               ) : (
@@ -37,12 +45,12 @@ export default function DetailHero({ sake }: DetailHeroProps) {
             ))}
           </div>
           <h1 className="font-display font-bold text-[28px] leading-[35px] text-accent whitespace-pre-line">
-            {sake.name}
+            {name}
           </h1>
           <p className="font-body font-medium text-sm text-text-secondary">
             {sake.brewery} / {sake.region}
           </p>
-          <Description text={sake.description} className="mt-2" />
+          <Description text={description} className="mt-2" />
         </div>
       </div>
 
@@ -61,14 +69,14 @@ export default function DetailHero({ sake }: DetailHeroProps) {
               ))}
             </div>
             <h1 className="font-display font-extrabold text-[72px] leading-[72px] tracking-[-3.6px] text-accent whitespace-pre-line">
-              {sake.name}
+              {name}
             </h1>
             <p className="font-body font-medium text-xl tracking-wider text-text-secondary">
               {sake.brewery} / {sake.region}
             </p>
           </div>
           <div className="flex flex-col gap-8 max-w-[448px]">
-            <Description text={sake.description} />
+            <Description text={description} />
             <PurchaseButtons
               amazonUrl={sake.amazonUrl}
               rakutenUrl={sake.rakutenUrl}
@@ -82,7 +90,7 @@ export default function DetailHero({ sake }: DetailHeroProps) {
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={sake.imageUrl}
-                alt={sake.name}
+                alt={name}
                 className="w-full h-full object-contain p-6"
               />
             ) : (
