@@ -19,7 +19,7 @@ export default function QuizChoiceButton({
           : "border-text-primary hover:border-accent"
       }`}
     >
-      <span className="font-body font-bold text-lg text-text-primary leading-7 pr-4">
+      <span className="font-body font-bold text-lg text-text-primary leading-7 pr-4 [word-break:auto-phrase]">
         {text}
       </span>
       <span className={`shrink-0 ${selected ? "text-accent" : "text-border"}`}>

@@ -65,7 +65,7 @@ export default function QuizChoiceCard({
 
       {/* Text */}
       <span
-        className={`font-body font-bold text-2xl leading-8 ${
+        className={`font-body font-bold text-2xl leading-8 [word-break:auto-phrase] ${
           selected ? "text-accent" : "text-text-primary"
         }`}
       >
