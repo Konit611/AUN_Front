@@ -117,7 +117,7 @@ export default function SakanaForm({ initial }: Props) {
     setSubmitting(true);
 
     const cleanIngredients = ingredients
-      .map((i) => ({ name: i.name.trim(), amount: i.amount.trim() }))
+      .map((i) => ({ name: (i.name ?? "").trim(), amount: (i.amount ?? "").trim() }))
       .filter((i) => i.name && i.amount);
     const cleanSteps = steps.map((s) => s.trim()).filter(Boolean);
 
@@ -308,25 +308,25 @@ export default function SakanaForm({ initial }: Props) {
                 <div key={idx} className="flex gap-2 items-center">
                   <input
                     type="text"
-                    value={ing.name}
+                    value={ing.name ?? ""}
                     onChange={(e) => {
                       const next = [...ingredients];
                       next[idx] = { ...next[idx], name: e.target.value };
                       setIngredients(next);
                     }}
                     placeholder="鶏もも肉"
-                    className={`${inputCls} flex-1`}
+                    className={`${inputClsBase} flex-1`}
                   />
                   <input
                     type="text"
-                    value={ing.amount}
+                    value={ing.amount ?? ""}
                     onChange={(e) => {
                       const next = [...ingredients];
                       next[idx] = { ...next[idx], amount: e.target.value };
                       setIngredients(next);
                     }}
                     placeholder="200g"
-                    className={`${inputCls} w-32`}
+                    className={`${inputClsBase} w-32`}
                   />
                   <button
                     type="button"
@@ -499,8 +499,9 @@ export default function SakanaForm({ initial }: Props) {
   );
 }
 
-const inputCls =
-  "w-full px-3 py-2 rounded-lg border border-border bg-surface font-body text-sm text-text-primary focus:outline-none focus:border-accent transition-colors";
+const inputClsBase =
+  "px-3 py-2 rounded-lg border border-border bg-surface font-body text-sm text-text-primary focus:outline-none focus:border-accent transition-colors";
+const inputCls = `w-full ${inputClsBase}`;
 
 function Section({
   title,
