@@ -394,6 +394,7 @@ export interface SakeDetailPairing {
   emoji: string;
   foodName: string;
   description: string;
+  foodImageUrl: string;
   imagePlaceholder: string;
 }
 

@@ -158,9 +158,18 @@ function PairingGrid({
           >
             <div className="mx-8 mt-8 rounded-[32px] overflow-hidden">
               <div className="h-48 bg-surface-raised flex items-center justify-center">
-                <span className="text-5xl group-hover:scale-110 transition-transform">
-                  {pairing.emoji}
-                </span>
+                {pairing.foodImageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={pairing.foodImageUrl}
+                    alt={pairing.foodName}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                ) : (
+                  <span className="text-5xl group-hover:scale-110 transition-transform">
+                    {pairing.emoji}
+                  </span>
+                )}
               </div>
             </div>
             <div className="px-8 pt-6 pb-8">

@@ -48,7 +48,7 @@ function SakanaCard({
             <img
               src={sakana.foodImageUrl}
               alt={sakana.name}
-              className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
             />
           ) : (
             <span className="text-7xl md:text-8xl group-hover:scale-110 transition-transform">
