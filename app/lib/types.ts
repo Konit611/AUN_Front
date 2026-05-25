@@ -118,6 +118,11 @@ export interface AdminFlavorMeta {
   label: string;
 }
 
+export interface AdminFlavor {
+  id: string;
+  label: string;
+}
+
 export interface AdminSakanaMeta {
   id: string;
   name: string;

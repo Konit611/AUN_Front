@@ -43,6 +43,7 @@ export default async function AdminLayout({
             <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible">
               <NavItem href="/admin" label="ダッシュボード" />
               <NavItem href="/admin/sake" label="日本酒" />
+              <NavItem href="/admin/sake/flavors" label="└ 味わいタグ" />
               <NavItem href="/admin/sakana" label="肴帖" />
               <NavItem
                 href="/admin/sakana/categories"
