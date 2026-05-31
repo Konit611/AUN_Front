@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PartialBlock } from "@blocknote/core";
 import { apiFetch, apiPost, apiPut, apiDelete, ApiError } from "@/app/lib/api";
+import { uploadAdminImage } from "@/app/lib/admin-upload";
 import type {
   AdminPairingCategory,
   AdminPairingItem,
@@ -14,6 +15,7 @@ import type {
 import RichEditor, { type RichEditorHandle } from "./rich-editor";
 import PreviewModal from "./preview-modal";
 import Stepper from "./stepper";
+import ImageUploader from "./image-uploader";
 
 // Stitch old (body / why_it_works / how_to_enjoy) into a BlockNote document so
 // pairings authored before the wizard keep their narrative when re-edited.
@@ -60,6 +62,7 @@ export default function PairingForm({ initial }: Props) {
   const [season, setSeason] = useState(initial?.season ?? "通年");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [heroImage, setHeroImage] = useState(initial?.heroImage ?? "");
+  const [pendingHeroImage, setPendingHeroImage] = useState<File | null>(null);
   const [personaCode, setPersonaCode] = useState(initial?.personaCode ?? "");
   const [position, setPosition] = useState<string>(
     initial?.position?.toString() ?? "0",
@@ -98,7 +101,7 @@ export default function PairingForm({ initial }: Props) {
     return categoryId !== "" && sakeId && sakanaId;
   }
 
-  async function buildPayload(asDraft: boolean): Promise<AdminPairingItemInput | null> {
+  async function buildPayload(asDraft: boolean, resolvedHeroImage?: string): Promise<AdminPairingItemInput | null> {
     if (categoryId === "") {
       setError("カテゴリは必須です（下書きでもカテゴリは必要）");
       return null;
@@ -124,7 +127,7 @@ export default function PairingForm({ initial }: Props) {
       body_json: bodyJson,
       body_html: bodyHtml,
       is_draft: asDraft,
-      hero_image: heroImage.trim() || null,
+      hero_image: (resolvedHeroImage ?? heroImage).trim() || null,
       persona_code: personaCode.trim() || null,
       position: parseInt(position, 10) || 0,
     };
@@ -133,8 +136,24 @@ export default function PairingForm({ initial }: Props) {
   async function save(asDraft: boolean) {
     setError(null);
     setSubmitting(true);
+
+    let resolvedHeroImage: string | undefined;
+    if (pendingHeroImage) {
+      try {
+        resolvedHeroImage = await uploadAdminImage(pendingHeroImage, "pairings");
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? `画像アップロードに失敗しました: ${err.message}`
+            : "画像アップロードに失敗しました",
+        );
+        setSubmitting(false);
+        return;
+      }
+    }
+
     try {
-      const payload = await buildPayload(asDraft);
+      const payload = await buildPayload(asDraft, resolvedHeroImage);
       if (!payload) {
         setSubmitting(false);
         return;
@@ -292,13 +311,16 @@ export default function PairingForm({ initial }: Props) {
                 className={inputCls}
               />
             </Field>
-            <Field label="メイン画像URL">
-              <input
-                type="url"
-                value={heroImage}
-                onChange={(e) => setHeroImage(e.target.value)}
-                placeholder="https://..."
-                className={inputCls}
+            <Field label="メイン画像">
+              <ImageUploader
+                url={heroImage || null}
+                pendingFile={pendingHeroImage}
+                onPick={setPendingHeroImage}
+                onRemove={() => {
+                  setHeroImage("");
+                  setPendingHeroImage(null);
+                }}
+                aspect="photo"
               />
             </Field>
             <Field label="ペルソナコード (任意)">
