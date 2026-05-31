@@ -53,7 +53,12 @@ function PairingCardMobile({ item }: { item: PairingGuideListItem }) {
 
       <div className="flex gap-4 mt-3">
         <div className="w-24 h-24 rounded-[32px] bg-surface-raised overflow-hidden flex items-center justify-center">
-          <span className="text-4xl">{item.emoji}</span>
+          {item.heroImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={item.heroImage} alt={item.foodName} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-4xl">{item.emoji}</span>
+          )}
         </div>
         <div className="w-24 h-24 rounded-[32px] bg-surface-raised overflow-hidden flex items-center justify-center">
           <span className="text-4xl">🍶</span>
@@ -80,7 +85,12 @@ function PairingCardDesktop({ item }: { item: PairingGuideListItem }) {
   return (
     <Link href={`/pairing/${item.id}`} className="group block bg-surface border border-border/20 rounded-tl-[48px] overflow-hidden hover:border-accent transition-colors">
       <div className="relative h-[360px] lg:h-[420px] bg-surface-raised overflow-hidden flex items-center justify-center">
-        <span className="text-8xl group-hover:scale-110 transition-transform">{item.emoji}</span>
+        {item.heroImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={item.heroImage} alt={item.foodName} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+        ) : (
+          <span className="text-8xl group-hover:scale-110 transition-transform">{item.emoji}</span>
+        )}
         {item.temperature && (
           <div className="absolute top-6 right-6">
             <span className="px-3 py-1.5 text-[10px] font-body font-bold tracking-wider rounded-full bg-white/90 text-accent border border-accent/10 backdrop-blur-sm uppercase">

@@ -72,13 +72,23 @@ export default async function PairingDetailPage({
               </p>
             </div>
 
-            {/* Image placeholders */}
+            {/* Food + Sake images */}
             <div className="flex gap-4 md:gap-6 md:shrink-0">
-              <div className="w-32 h-32 md:w-48 md:h-48 rounded-[32px] md:rounded-[48px] bg-bg flex items-center justify-center">
-                <span className="text-5xl md:text-7xl">{pairing.emoji}</span>
+              <div className="w-32 h-32 md:w-48 md:h-48 rounded-[32px] md:rounded-[48px] bg-bg overflow-hidden flex items-center justify-center">
+                {pairing.foodImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={pairing.foodImage} alt={pairing.foodName} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-5xl md:text-7xl">{pairing.emoji}</span>
+                )}
               </div>
-              <div className="w-32 h-32 md:w-48 md:h-48 rounded-[32px] md:rounded-[48px] bg-bg flex items-center justify-center">
-                <span className="text-5xl md:text-7xl">🍶</span>
+              <div className="w-32 h-32 md:w-48 md:h-48 rounded-[32px] md:rounded-[48px] bg-bg overflow-hidden flex items-center justify-center">
+                {pairing.sakeImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={pairing.sakeImage} alt={pairing.sakeName} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-5xl md:text-7xl">🍶</span>
+                )}
               </div>
             </div>
           </div>
