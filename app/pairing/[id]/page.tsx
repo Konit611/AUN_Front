@@ -82,7 +82,7 @@ export default async function PairingDetailPage({
                   <span className="text-5xl md:text-7xl">{pairing.emoji}</span>
                 )}
               </div>
-              <div className="w-32 h-32 md:w-48 md:h-48 rounded-[32px] md:rounded-[48px] bg-bg overflow-hidden flex items-center justify-center">
+              <div className="w-32 h-32 md:w-48 md:h-48 rounded-[32px] md:rounded-[48px] bg-white overflow-hidden flex items-center justify-center">
                 {pairing.sakeImage ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={pairing.sakeImage} alt={pairing.sakeName} className="w-full h-full object-contain p-2" />
