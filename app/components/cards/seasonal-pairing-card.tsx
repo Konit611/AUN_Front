@@ -26,15 +26,9 @@ export function SeasonalPairingCardMobile({
       className="bg-surface border border-border/60 rounded-tl-[32px] rounded-br-[32px] flex flex-col w-[288px] shrink-0 snap-start shadow-sm hover:border-accent transition-colors duration-200"
     >
       <div className="p-4 pb-0">
-        <div className="w-full h-[160px] rounded-2xl bg-surface-raised overflow-hidden flex items-center justify-center">
+        <div className="relative w-full h-[160px] rounded-2xl bg-surface-raised overflow-hidden flex items-center justify-center">
           {heroImage ? (
-            <Image
-              src={heroImage}
-              alt={food}
-              width={256}
-              height={160}
-              className="w-full h-full object-cover"
-            />
+            <Image src={heroImage} alt={food} fill className="object-cover" />
           ) : (
             <span className="text-[64px] leading-none">{emoji}</span>
           )}
@@ -75,15 +69,9 @@ export function SeasonalPairingCardDesktop({
       className="flex flex-col bg-surface border border-border/60 rounded-tl-[48px] rounded-br-[48px] hover:border-accent transition-colors duration-200"
     >
       <div className="p-6 pb-0">
-        <div className="w-full h-[200px] rounded-[24px] bg-surface-raised overflow-hidden flex items-center justify-center">
+        <div className="relative w-full h-[200px] rounded-[24px] bg-surface-raised overflow-hidden flex items-center justify-center">
           {heroImage ? (
-            <Image
-              src={heroImage}
-              alt={food}
-              width={400}
-              height={200}
-              className="w-full h-full object-cover"
-            />
+            <Image src={heroImage} alt={food} fill className="object-cover" />
           ) : (
             <span className="text-[80px] leading-none">{emoji}</span>
           )}
@@ -91,9 +79,7 @@ export function SeasonalPairingCardDesktop({
       </div>
 
       <div className="p-8 flex flex-col items-center text-center gap-4">
-        <h3 className="font-display font-bold text-2xl text-accent">
-          {food}
-        </h3>
+        <h3 className="font-display font-bold text-2xl text-accent">{food}</h3>
 
         <div className="flex items-center justify-center">
           <svg width="8" height="8" viewBox="0 0 8 8" className="text-text-muted">

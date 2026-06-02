@@ -27,15 +27,9 @@ export default function ClassicPairingCard({
       className="bg-surface border border-border/60 rounded-tl-[32px] rounded-br-[32px] md:rounded-tl-[48px] md:rounded-br-[48px] p-4 md:p-6 flex items-center gap-4 md:gap-6 hover:border-accent transition-colors duration-200"
     >
       {/* Image / Emoji */}
-      <div className="shrink-0 w-20 h-20 md:w-28 md:h-28 rounded-2xl md:rounded-[24px] bg-surface-raised overflow-hidden flex items-center justify-center">
+      <div className="relative shrink-0 w-20 h-20 md:w-28 md:h-28 rounded-2xl md:rounded-[24px] bg-surface-raised overflow-hidden flex items-center justify-center">
         {heroImage ? (
-          <Image
-            src={heroImage}
-            alt={food}
-            width={112}
-            height={112}
-            className="w-full h-full object-cover"
-          />
+          <Image src={heroImage} alt={food} fill className="object-cover" />
         ) : (
           <span className="text-3xl md:text-4xl">{emoji}</span>
         )}
@@ -54,9 +48,7 @@ export default function ClassicPairingCard({
             {sake}
           </span>
         </div>
-        <Tag className="bg-accent/10 text-accent mt-2">
-          {temperature}
-        </Tag>
+        <Tag className="bg-accent/10 text-accent mt-2">{temperature}</Tag>
         <p className="hidden md:block font-body text-sm text-text-secondary leading-relaxed mt-2">
           {description}
         </p>
