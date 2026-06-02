@@ -24,25 +24,25 @@ export default function ClassicPairingCard({
   return (
     <Link
       href={`/pairing/${id}`}
-      className="bg-surface border border-border/60 rounded-tl-[32px] rounded-br-[32px] md:rounded-tl-[48px] md:rounded-br-[48px] overflow-hidden flex items-center gap-6 md:gap-8 hover:border-accent transition-colors duration-200"
+      className="bg-surface border border-border/60 rounded-tl-[32px] rounded-br-[32px] md:rounded-tl-[48px] md:rounded-br-[48px] p-4 md:p-6 flex items-center gap-4 md:gap-6 hover:border-accent transition-colors duration-200"
     >
-      {/* Image / Emoji circle */}
-      <div className="shrink-0 w-20 h-20 md:w-36 md:h-36 rounded-br-[32px] md:rounded-br-[48px] bg-surface-raised overflow-hidden flex items-center justify-center">
+      {/* Image / Emoji */}
+      <div className="shrink-0 w-20 h-20 md:w-28 md:h-28 rounded-2xl md:rounded-[24px] bg-surface-raised overflow-hidden flex items-center justify-center">
         {heroImage ? (
           <Image
             src={heroImage}
             alt={food}
-            width={144}
-            height={144}
+            width={112}
+            height={112}
             className="w-full h-full object-cover"
           />
         ) : (
-          <span className="text-3xl md:text-5xl">{emoji}</span>
+          <span className="text-3xl md:text-4xl">{emoji}</span>
         )}
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0 py-6 pr-6 md:py-10 md:pr-10">
+      <div className="flex-1 min-w-0">
         <h3 className="font-display font-bold text-base md:text-2xl text-accent leading-tight">
           {food}
         </h3>
