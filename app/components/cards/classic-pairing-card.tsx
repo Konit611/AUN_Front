@@ -40,15 +40,15 @@ export default function ClassicPairingCard({
         <h3 className="font-display font-bold text-base md:text-2xl text-accent leading-tight">
           {food}
         </h3>
-        <div className="flex items-center gap-2 mt-1">
+        <div className="flex items-center gap-2 mt-1 flex-wrap">
           <svg width="7" height="7" viewBox="0 0 7 7" className="text-accent shrink-0">
             <rect x="3.5" y="0" width="4.95" height="4.95" rx="1" transform="rotate(45 3.5 0)" fill="currentColor" />
           </svg>
           <span className="font-body font-bold text-sm md:text-base text-accent">
             {sake}
           </span>
+          <Tag className="bg-accent/10 text-accent ml-1">{temperature}</Tag>
         </div>
-        <Tag className="bg-accent/10 text-accent mt-2">{temperature}</Tag>
         <p className="hidden md:block font-body text-sm text-text-secondary leading-relaxed mt-2">
           {description}
         </p>
