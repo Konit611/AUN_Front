@@ -20,7 +20,7 @@ export default function SeasonalPairingsSection({
       <div className="max-w-[1184px] mx-auto flex flex-col gap-10 md:gap-20">
         <div className="flex items-end justify-between gap-4">
           <h2 className="font-display font-bold text-[22px] md:text-[42px] text-accent leading-tight">
-            季節のペアリング
+            特集ペアリング
           </h2>
           <span className="text-xs md:text-sm text-accent/60 tracking-widest uppercase whitespace-nowrap">
             {label}
