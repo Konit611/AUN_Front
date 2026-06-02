@@ -17,6 +17,7 @@ interface CategoryInput {
   label: string;
   title: string;
   position: number;
+  is_featured: boolean;
 }
 
 export default function CategoryForm({ initial }: Props) {
@@ -29,6 +30,7 @@ export default function CategoryForm({ initial }: Props) {
   const [position, setPosition] = useState<string>(
     initial?.position?.toString() ?? "0"
   );
+  const [isFeatured, setIsFeatured] = useState(initial?.isFeatured ?? false);
 
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -43,6 +45,7 @@ export default function CategoryForm({ initial }: Props) {
       label: label.trim(),
       title: title.trim(),
       position: parseInt(position, 10) || 0,
+      is_featured: isFeatured,
     };
 
     try {
@@ -132,6 +135,28 @@ export default function CategoryForm({ initial }: Props) {
           className={inputCls}
         />
       </Field>
+
+      <label className="flex items-center gap-3 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={isFeatured}
+          onChange={(e) => setIsFeatured(e.target.checked)}
+          className="w-4 h-4 accent-accent"
+        />
+        <span className="font-body text-sm text-text-primary">
+          トップページの特集ペアリングに表示する
+        </span>
+        {isFeatured && (
+          <span className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full font-body font-medium">
+            特集中
+          </span>
+        )}
+      </label>
+      {isFeatured && (
+        <p className="font-body text-xs text-text-muted -mt-2">
+          他のカテゴリの特集設定は自動的に解除されます。
+        </p>
+      )}
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 font-body text-sm">

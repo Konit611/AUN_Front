@@ -160,6 +160,7 @@ export interface AdminPairingCategory {
   label: string;
   title: string;
   position: number;
+  isFeatured: boolean;
 }
 
 export interface AdminPairingItem {

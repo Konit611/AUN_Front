@@ -43,6 +43,9 @@ export default async function AdminCategoryListPage() {
                 ラベル
               </th>
               <th className="text-left px-5 py-3 font-body font-bold text-[10px] tracking-wider uppercase text-accent/60">
+                特集
+              </th>
+              <th className="text-left px-5 py-3 font-body font-bold text-[10px] tracking-wider uppercase text-accent/60">
                 slug
               </th>
               <th className="text-left px-5 py-3 font-body font-bold text-[10px] tracking-wider uppercase text-accent/60">
@@ -64,6 +67,13 @@ export default async function AdminCategoryListPage() {
                 </td>
                 <td className="px-5 py-4 font-body font-medium text-text-primary">
                   {c.label}
+                </td>
+                <td className="px-5 py-4">
+                  {c.isFeatured && (
+                    <span className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full font-body font-medium">
+                      特集中
+                    </span>
+                  )}
                 </td>
                 <td className="px-5 py-4 font-body text-xs text-text-muted">
                   {c.slug}
