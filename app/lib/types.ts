@@ -359,6 +359,7 @@ export interface HomePairingCard {
   sake: string;
   temperature: string;
   description: string;
+  heroImage: string | null;
 }
 
 export interface FeaturedSake {
