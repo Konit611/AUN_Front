@@ -475,8 +475,14 @@ export default function SakanaForm({ initial }: Props) {
               前へ
             </button>
           )}
+          {/*
+            Distinct keys required: without them React reuses the same <button>
+            node when the final 次へ click flips it to type="submit", submitting
+            the form and bouncing back to the list. See article-form.tsx.
+          */}
           {step < 3 ? (
             <button
+              key="next"
               type="button"
               onClick={goNext}
               disabled={submitting}
@@ -486,6 +492,7 @@ export default function SakanaForm({ initial }: Props) {
             </button>
           ) : (
             <button
+              key="submit"
               type="submit"
               disabled={submitting}
               className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"

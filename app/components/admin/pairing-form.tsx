@@ -417,8 +417,15 @@ export default function PairingForm({ initial }: Props) {
           >
             下書き保存
           </button>
+          {/*
+            Distinct keys required: without them React reuses the same <button>
+            node when the final 次へ click flips it to type="submit", which then
+            submits the form and bounces the author back to the list. See
+            article-form.tsx for the full explanation.
+          */}
           {step < 3 ? (
             <button
+              key="next"
               type="button"
               onClick={goNext}
               disabled={submitting}
@@ -428,6 +435,7 @@ export default function PairingForm({ initial }: Props) {
             </button>
           ) : (
             <button
+              key="submit"
               type="submit"
               disabled={submitting}
               className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"

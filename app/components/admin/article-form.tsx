@@ -394,8 +394,17 @@ export default function ArticleForm({ initial }: Props) {
           >
             下書き保存
           </button>
+          {/*
+            Distinct keys are REQUIRED here. Without them React reuses the same
+            <button> DOM node across the step 1→2 swap and only flips its `type`
+            from "button" to "submit". The 次へ click then resolves its default
+            action against a node that is now a submit button, submitting the
+            form and bouncing the author back to the list. Distinct keys force a
+            node replacement so the clicked node is detached and never submits.
+          */}
           {step < 2 ? (
             <button
+              key="next"
               type="button"
               onClick={goNext}
               disabled={submitting}
@@ -405,6 +414,7 @@ export default function ArticleForm({ initial }: Props) {
             </button>
           ) : (
             <button
+              key="submit"
               type="submit"
               disabled={submitting}
               className="px-6 py-2.5 rounded-full bg-accent text-white font-body font-medium text-sm hover:bg-accent-hover disabled:opacity-50 transition-colors"
