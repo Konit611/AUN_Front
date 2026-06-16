@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PartialBlock } from "@blocknote/core";
 import { apiFetch, apiPost, apiPut, apiDelete, ApiError } from "@/app/lib/api";
+import { uploadAdminImage } from "@/app/lib/admin-upload";
 import type {
   AdminArticle,
   AdminArticleBlock,
@@ -11,6 +12,7 @@ import type {
   AdminArticleInput,
 } from "@/app/lib/types";
 import RichEditor, { type RichEditorHandle } from "./rich-editor";
+import ImageUploader from "./image-uploader";
 import PreviewModal from "./preview-modal";
 import Stepper from "./stepper";
 
@@ -77,6 +79,7 @@ export default function ArticleForm({ initial }: Props) {
   const [readTime, setReadTime] = useState(initial?.readTime ?? "5 min");
   const [emoji, setEmoji] = useState(initial?.emoji ?? "");
   const [heroImageUrl, setHeroImageUrl] = useState(initial?.heroImageUrl ?? "");
+  const [pendingHeroImage, setPendingHeroImage] = useState<File | null>(null);
 
   const [categories, setCategories] = useState<AdminArticleCategory[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -100,7 +103,10 @@ export default function ArticleForm({ initial }: Props) {
     return Boolean(slug.trim() && title.trim() && categoryId !== "" && date);
   }
 
-  async function buildPayload(asDraft: boolean): Promise<AdminArticleInput | null> {
+  async function buildPayload(
+    asDraft: boolean,
+    resolvedHeroImage?: string,
+  ): Promise<AdminArticleInput | null> {
     if (!slug.trim() || !title.trim() || categoryId === "" || !date) {
       setError("slug・タイトル・カテゴリ・日付は下書きでも必須です");
       setStep(1);
@@ -119,7 +125,7 @@ export default function ArticleForm({ initial }: Props) {
       date,
       read_time: readTime.trim(),
       emoji: emoji.trim(),
-      hero_image_url: heroImageUrl.trim() || null,
+      hero_image_url: (resolvedHeroImage ?? heroImageUrl).trim() || null,
       body: [],
       body_json: bodyJson,
       body_html: bodyHtml,
@@ -130,8 +136,24 @@ export default function ArticleForm({ initial }: Props) {
   async function save(asDraft: boolean) {
     setError(null);
     setSubmitting(true);
+
+    let resolvedHeroImage: string | undefined;
+    if (pendingHeroImage) {
+      try {
+        resolvedHeroImage = await uploadAdminImage(pendingHeroImage, "articles");
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? `画像アップロードに失敗しました: ${err.message}`
+            : "画像アップロードに失敗しました",
+        );
+        setSubmitting(false);
+        return;
+      }
+    }
+
     try {
-      const payload = await buildPayload(asDraft);
+      const payload = await buildPayload(asDraft, resolvedHeroImage);
       if (!payload) {
         setSubmitting(false);
         return;
@@ -284,13 +306,16 @@ export default function ArticleForm({ initial }: Props) {
                 className={inputCls}
               />
             </Field>
-            <Field label="ヒーロー画像URL">
-              <input
-                type="url"
-                value={heroImageUrl}
-                onChange={(e) => setHeroImageUrl(e.target.value)}
-                placeholder="https://..."
-                className={inputCls}
+            <Field label="ヒーロー画像">
+              <ImageUploader
+                url={heroImageUrl || null}
+                pendingFile={pendingHeroImage}
+                onPick={setPendingHeroImage}
+                onRemove={() => {
+                  setHeroImageUrl("");
+                  setPendingHeroImage(null);
+                }}
+                aspect="video"
               />
             </Field>
           </div>
