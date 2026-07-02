@@ -184,7 +184,7 @@ export default function NewEntryForm({ initialEntry }: NewEntryFormProps = {}) {
               onChange={(e) => setBrewery(e.target.value)}
               className={inputClass()}
             />
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
               <span className="text-[11px] font-body text-text-muted">
                 カタログ未登録の日本酒として記録されます。
               </span>

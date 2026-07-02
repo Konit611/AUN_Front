@@ -115,7 +115,7 @@ export default function SakePicker({ onSelect, onManual }: SakePickerProps) {
       <button
         type="button"
         onClick={onManual}
-        className="self-start text-sm font-body text-accent underline underline-offset-4 hover:text-accent-hover transition-colors"
+        className="self-end text-sm font-body text-accent underline underline-offset-4 hover:text-accent-hover transition-colors"
       >
         見つからない場合は手動で入力
       </button>
