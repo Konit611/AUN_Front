@@ -60,8 +60,13 @@ function PairingCardMobile({ item }: { item: PairingGuideListItem }) {
             <span className="text-4xl">{item.emoji}</span>
           )}
         </div>
-        <div className="w-24 h-24 rounded-[32px] bg-surface-raised overflow-hidden flex items-center justify-center">
-          <span className="text-4xl">🍶</span>
+        <div className="w-24 h-24 rounded-[32px] bg-white overflow-hidden flex items-center justify-center">
+          {item.sakeImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={item.sakeImage} alt={item.sakeName} className="w-full h-full object-contain p-2" />
+          ) : (
+            <span className="text-4xl">🍶</span>
+          )}
         </div>
       </div>
 
