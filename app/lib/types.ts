@@ -531,6 +531,8 @@ export interface TastingNote {
 
 export interface JournalEntry {
   id: string;
+  sakeId?: string | null;
+  isVerified?: boolean;
   sakeName: string;
   brewery?: string;
   category?: string;

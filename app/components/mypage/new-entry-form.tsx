@@ -4,7 +4,8 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiPost, apiPut } from "@/app/lib/api";
 import { compressToDataURL } from "@/app/lib/image-upload";
-import type { JournalEntry } from "@/app/lib/types";
+import type { JournalEntry, SakeListItem } from "@/app/lib/types";
+import SakePicker from "./sake-picker";
 import StarRating from "./star-rating";
 
 const profileAxes = [
@@ -34,6 +35,14 @@ export default function NewEntryForm({ initialEntry }: NewEntryFormProps = {}) {
   const [submitting, setSubmitting] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
   const [rating, setRating] = useState(initialEntry?.rating ?? 0);
+  const [sakeId, setSakeId] = useState<string | undefined>(
+    initialEntry?.sakeId ?? undefined,
+  );
+  // Existing entries with no sakeId are off-catalog: open them in manual mode
+  // so their free text stays visible. New entries start in the search picker.
+  const [manualMode, setManualMode] = useState<boolean>(
+    Boolean(initialEntry) && !initialEntry?.sakeId,
+  );
   const [sakeName, setSakeName] = useState(initialEntry?.sakeName ?? "");
   const [brewery, setBrewery] = useState(initialEntry?.brewery ?? "");
   const [aroma, setAroma] = useState(initialEntry?.tasting.aroma ?? "");
@@ -57,6 +66,20 @@ export default function NewEntryForm({ initialEntry }: NewEntryFormProps = {}) {
     setProfile((prev) => ({ ...prev, [key]: value }));
   };
 
+  const handleSelectSake = (sake: SakeListItem) => {
+    setSakeId(sake.id);
+    setSakeName(sake.name);
+    setBrewery(sake.brewery ?? "");
+    setManualMode(false);
+  };
+
+  const handleClearSake = () => {
+    setSakeId(undefined);
+    setSakeName("");
+    setBrewery("");
+    setManualMode(false);
+  };
+
   const handlePickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
@@ -72,10 +95,13 @@ export default function NewEntryForm({ initialEntry }: NewEntryFormProps = {}) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!sakeName.trim() || !date) return;
+    // Need a date, and either a catalog pick (sakeId) or a manual name.
+    if (!date) return;
+    if (!sakeId && !sakeName.trim()) return;
 
     setSubmitting(true);
     const payload = {
+      sakeId: sakeId ?? undefined,
       sakeName: sakeName.trim(),
       brewery: brewery.trim() || undefined,
       date,
@@ -108,33 +134,75 @@ export default function NewEntryForm({ initialEntry }: NewEntryFormProps = {}) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6 md:gap-12">
-      {/* Sake Name */}
+      {/* Sake selection — catalog picker with manual fallback */}
       <div className="flex flex-col gap-2 md:gap-3">
-        <label htmlFor="sakeName" className={labelClass()}>
-          日本酒の名前 <span className="text-red-700">*</span>
+        <label className={labelClass()}>
+          日本酒 <span className="text-red-700">*</span>
         </label>
-        <input
-          id="sakeName"
-          type="text"
-          required
-          placeholder="例: 獺祭 純米大吟醸45"
-          value={sakeName}
-          onChange={(e) => setSakeName(e.target.value)}
-          className={inputClass()}
-        />
-      </div>
 
-      {/* Brewery */}
-      <div className="flex flex-col gap-2 md:gap-3">
-        <label htmlFor="brewery" className={labelClass()}>醸造所</label>
-        <input
-          id="brewery"
-          type="text"
-          placeholder="例: 旭酒造"
-          value={brewery}
-          onChange={(e) => setBrewery(e.target.value)}
-          className={inputClass()}
-        />
+        {sakeId ? (
+          /* Picked from catalog — read-only chip */
+          <div className="flex items-center justify-between gap-3 bg-surface border border-accent/30 rounded-lg md:rounded-[32px] px-4 md:px-5 py-4 md:py-5">
+            <span className="flex flex-col min-w-0">
+              <span className="flex items-center gap-2">
+                <span className="text-sm md:text-base font-body font-medium text-text-primary truncate">
+                  {sakeName}
+                </span>
+                <span className="shrink-0 text-[11px] font-body font-bold text-accent bg-accent-light px-2 py-0.5 rounded-full">
+                  登録酒
+                </span>
+              </span>
+              {brewery && (
+                <span className="text-xs font-body text-text-muted truncate">{brewery}</span>
+              )}
+            </span>
+            <button
+              type="button"
+              onClick={handleClearSake}
+              className="shrink-0 px-4 py-2 rounded-full bg-surface-raised text-accent text-sm font-body font-bold hover:bg-accent/10 transition-colors"
+            >
+              変更
+            </button>
+          </div>
+        ) : manualMode ? (
+          /* Manual free-text entry — recorded as off-catalog / unverified */
+          <div className="flex flex-col gap-3">
+            <input
+              id="sakeName"
+              type="text"
+              required
+              placeholder="例: 獺祭 純米大吟醸45"
+              value={sakeName}
+              onChange={(e) => setSakeName(e.target.value)}
+              className={inputClass()}
+            />
+            <input
+              id="brewery"
+              type="text"
+              placeholder="蔵元（例: 旭酒造）"
+              value={brewery}
+              onChange={(e) => setBrewery(e.target.value)}
+              className={inputClass()}
+            />
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span className="text-[11px] font-body text-text-muted">
+                カタログ未登録の日本酒として記録されます。
+              </span>
+              <button
+                type="button"
+                onClick={() => setManualMode(false)}
+                className="text-sm font-body text-accent underline underline-offset-4 hover:text-accent-hover transition-colors"
+              >
+                検索に戻る
+              </button>
+            </div>
+          </div>
+        ) : (
+          <SakePicker
+            onSelect={handleSelectSake}
+            onManual={() => setManualMode(true)}
+          />
+        )}
       </div>
 
       {/* Photo Upload */}

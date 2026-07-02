@@ -34,6 +34,11 @@ export default function JournalCard({ entry }: JournalCardProps) {
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-body font-bold text-base text-accent leading-tight group-hover:text-accent-hover transition-colors">
               {entry.sakeName}
+              {entry.isVerified && (
+                <span className="ml-2 align-middle inline-block shrink-0 text-[10px] font-body font-bold text-accent bg-accent-light px-1.5 py-0.5 rounded-full">
+                  登録酒
+                </span>
+              )}
             </h3>
             {entry.category && (
               <span className="hidden md:inline-block shrink-0 px-2 py-1 rounded-2xl bg-surface-raised text-[10px] text-text-secondary tracking-wider uppercase">

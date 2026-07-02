@@ -76,13 +76,28 @@ export default async function JournalDetailPage({
 
           {/* Name + Brewery */}
           <div className="flex flex-col gap-1">
-            <h1 className="font-display font-bold text-[28px] md:text-[40px] leading-tight text-accent">
-              {entry.sakeName}
-            </h1>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="font-display font-bold text-[28px] md:text-[40px] leading-tight text-accent">
+                {entry.sakeName}
+              </h1>
+              {entry.isVerified && (
+                <span className="shrink-0 text-[11px] font-body font-bold text-accent bg-accent-light px-2 py-0.5 rounded-full">
+                  登録酒
+                </span>
+              )}
+            </div>
             {entry.brewery && (
               <p className="font-body font-medium text-base text-text-secondary">
                 {entry.brewery}
               </p>
+            )}
+            {entry.isVerified && entry.sakeId && (
+              <Link
+                href={`/encyclopedia/${entry.sakeId}`}
+                className="mt-1 self-start text-sm font-body text-accent underline underline-offset-4 hover:text-accent-hover transition-colors"
+              >
+                この日本酒の詳細を見る
+              </Link>
             )}
           </div>
 
