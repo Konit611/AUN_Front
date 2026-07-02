@@ -87,7 +87,7 @@ export default function SakePicker({ onSelect, onManual }: SakePickerProps) {
                     <img
                       src={sake.imageUrl}
                       alt=""
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   ) : (
                     <span className="text-xs text-text-muted">酒</span>
