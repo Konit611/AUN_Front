@@ -51,6 +51,7 @@ export default function NewEntryForm({ initialEntry }: NewEntryFormProps = {}) {
   const [temperature, setTemperature] = useState(initialEntry?.tasting.temperature ?? "");
   const [pairing, setPairing] = useState(initialEntry?.tasting.pairing ?? "");
   const [memo, setMemo] = useState(initialEntry?.tasting.memo ?? "");
+  const [impression, setImpression] = useState(initialEntry?.tasting.impression ?? "");
   const [date, setDate] = useState(initialEntry?.date ?? "");
   const [imagePath, setImagePath] = useState<string | undefined>(initialEntry?.imagePath);
   const [profile, setProfile] = useState(
@@ -71,6 +72,8 @@ export default function NewEntryForm({ initialEntry }: NewEntryFormProps = {}) {
     setSakeName(sake.name);
     setBrewery(sake.brewery ?? "");
     setManualMode(false);
+    // Pre-fill the tasting profile with the catalog sake's registered values.
+    if (sake.profile) setProfile(sake.profile);
   };
 
   const handleClearSake = () => {
@@ -115,6 +118,7 @@ export default function NewEntryForm({ initialEntry }: NewEntryFormProps = {}) {
         temperature: temperature.trim(),
         pairing: pairing.trim() || undefined,
         memo: memo.trim() || undefined,
+        impression: impression.trim() || undefined,
       },
     };
 
@@ -365,6 +369,19 @@ export default function NewEntryForm({ initialEntry }: NewEntryFormProps = {}) {
             className={`${inputClass()} resize-none`}
           />
         </div>
+      </div>
+
+      {/* Personal impression — about the moment, not the sake */}
+      <div className="flex flex-col gap-2 md:gap-3">
+        <label htmlFor="impression" className={labelClass()}>自分の感想</label>
+        <textarea
+          id="impression"
+          placeholder="例: 久しぶりに会う友人と。ゆっくり話せた特別な夜。"
+          rows={3}
+          value={impression}
+          onChange={(e) => setImpression(e.target.value)}
+          className={`${inputClass()} resize-none`}
+        />
       </div>
 
       {/* Date + Rating row */}

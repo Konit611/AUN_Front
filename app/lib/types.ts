@@ -394,6 +394,7 @@ export interface SakeListItem {
   region: string;
   servingTags: string[];
   imageUrl: string | null;
+  profile?: SakeProfile;
 }
 
 export interface SakeDetailPairing {
@@ -527,6 +528,7 @@ export interface TastingNote {
   temperature: string;
   pairing?: string;
   memo?: string;
+  impression?: string;
 }
 
 export interface JournalEntry {

@@ -139,6 +139,19 @@ export default async function JournalDetailPage({
             </div>
           )}
 
+          {entry.tasting.impression && (
+            <div className="flex flex-col gap-2">
+              <span className="font-body font-bold text-xs text-text-secondary/70 tracking-wider uppercase">
+                自分の感想
+              </span>
+              <div className="bg-surface border border-border rounded-2xl px-5 py-4">
+                <p className="font-body text-sm text-text-primary leading-relaxed whitespace-pre-line">
+                  {entry.tasting.impression}
+                </p>
+              </div>
+            </div>
+          )}
+
           <JournalActions entryId={entry.id} />
         </div>
       </div>
